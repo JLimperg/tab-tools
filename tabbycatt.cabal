@@ -79,7 +79,7 @@ executable tabbycat-csv-importer
                      , bytestring
                      , cassava
                      , containers
-                     , http-conduit
+                     , req
                      , text
                      , vector
   other-modules:       Api

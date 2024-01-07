@@ -12,13 +12,15 @@ import           Data.Functor (void)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Text (Text)
+import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Data.Text.IO as T
-import           Network.HTTP.Simple
+import           Network.HTTP.Req
 
 import           Api.Types
 import qualified Csv
 
+-- TODO evil hardcoding
 _BASE_URL :: String
 _BASE_URL = "https://tabbycat.limperg.de/api/v1"
 
@@ -26,39 +28,45 @@ newtype Token = Token { fromToken :: Text }
 
 type TournamentSlug = String
 
-setToken :: Token -> Request -> Request
-setToken (Token tk)
-  = setRequestHeader "Authorization" ["Token " <> T.encodeUtf8 tk]
+authHeader :: Token -> Option scheme
+authHeader (Token tk) = header "Authorization" $ "Token " <> T.encodeUtf8 tk
 
-makeRequest_ :: Token -> String -> IO Request
-makeRequest_ token u = setToken token <$> parseRequestThrow (_BASE_URL ++ u)
+mkUrl :: [Text] -> Url 'Https
+mkUrl = foldr (flip (/:)) (https "tabbycat.limperg.de" /: "api" /: "v1")
 
-makeRequest :: (ToJSON a) => Token -> a -> String -> IO Request
-makeRequest token body u = setRequestBodyJSON body <$> makeRequest_ token u
+getOpts :: FromJSON a => Url 'Https -> Option 'Https -> Token -> IO a
+getOpts url opts token = runReq defaultHttpConfig $
+  responseBody <$> req GET url NoReqBody jsonResponse
+    (authHeader token <> opts)
 
-get_ :: (FromJSON a) => Token -> String -> IO a
-get_ token url = do
-  request <- makeRequest_ token url
-  getResponseBody <$> httpJSON request
+get :: FromJSON a => Url 'Https -> Token -> IO a
+get url = getOpts url mempty
 
-post :: (ToJSON a, FromJSON b) => String -> Token -> a -> IO b
-post url token body = do
-  request <- setRequestMethod "POST" <$> makeRequest token body url
-  getResponseBody <$> httpJSON request
+postOpts ::
+  (ToJSON a, FromJSON b) => Url 'Https -> Option 'Https -> Token -> a -> IO b
+postOpts url opts token body = runReq defaultHttpConfig $
+  responseBody <$> req POST url (ReqBodyJson body) jsonResponse
+    (authHeader token <> opts)
 
-post_ :: (ToJSON a) => String -> Token -> a -> IO ()
-post_ url token body = do
-  request <- setRequestMethod "POST" <$> makeRequest token body url
-  void $ httpNoBody request
+post :: (ToJSON a, FromJSON b) => Url 'Https -> Token -> a -> IO b
+post url = postOpts url mempty
+
+postOpts_ :: ToJSON a => Url 'Https -> Option 'Https -> Token -> a -> IO ()
+postOpts_ url opts token body = void $ runReq defaultHttpConfig $
+  req POST url (ReqBodyJson body) ignoreResponse
+    (authHeader token <> opts)
+
+post_ :: ToJSON a => Url 'Https -> Token -> a -> IO ()
+post_ url = postOpts_ url mempty
 
 getInstitutions :: Token -> IO GetInstitutions
-getInstitutions token = get_ token "/institutions"
+getInstitutions = get (mkUrl ["institutions"])
 
 postInstitution
   :: Token -> AddInstitution -> IO (Csv.InstitutionCode, InstitutionURL)
 postInstitution token inst = do
   T.putStrLn $ "Adding institution " <> inst.code
-  resp :: AddInstitutionResponse <- post "/institutions" token inst
+  resp :: AddInstitutionResponse <- post (mkUrl ["institutions"]) token inst
   pure (Csv.InstitutionCode inst.code, resp.url)
 
 postInstitutions
@@ -70,7 +78,8 @@ postTeam
   :: Token -> TournamentSlug -> AddTeam -> IO (Csv.TeamReference, TeamURL)
 postTeam token tournament team = do
   T.putStrLn $ "Adding team " <> team.reference
-  resp :: AddTeamResponse <- post ("/tournaments/" ++ tournament ++ "/teams") token team
+  resp :: AddTeamResponse <-
+    post (mkUrl ["tournaments", T.pack tournament, "teams"]) token team
   pure
     (Csv.TeamReference team.reference, resp.url)
 
@@ -83,7 +92,7 @@ postTeams token tournament teams
 postAdjudicator :: Token -> TournamentSlug -> AddAdjudicator -> IO ()
 postAdjudicator token tournament adj = do
   T.putStrLn $ "Adding adjudicator " <> adj.name
-  post_ ("/tournaments/" ++ tournament ++ "/adjudicators") token adj
+  post_ (mkUrl ["tournaments", T.pack tournament, "adjudicators"]) token adj
 
 postAdjudicators
   :: Token -> TournamentSlug -> [AddAdjudicator]

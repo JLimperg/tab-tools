@@ -73,8 +73,7 @@ data QuestionReq = QuestionReq
 instance FromJSON QuestionReq
 
 authHeader :: Token -> Option scheme
-authHeader (Token tk) = header "Authorization" $
-  "Token " <> Text.encodeUtf8 tk
+authHeader (Token tk) = header "Authorization" $ "Token " <> Text.encodeUtf8 tk
 
 getOpts :: FromJSON a => Url 'Https -> Option 'Https -> Token -> IO a
 getOpts url opts token = runReq defaultHttpConfig $
