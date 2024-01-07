@@ -44,6 +44,7 @@ common defaults
                      , ImportQualifiedPost
                      , DeriveGeneric
                      , LambdaCase
+                     , StrictData
 
 executable tabbycat-feedback
   import:              defaults
