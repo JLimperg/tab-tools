@@ -8,7 +8,7 @@ license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Jannis Limperg
 maintainer:          jannis@limperg.de
-copyright:           (C) 2023 Jannis Limperg
+copyright:           (C) 2024 Jannis Limperg
 category:            Application
 build-type:          Simple
 extra-source-files:  README.md
