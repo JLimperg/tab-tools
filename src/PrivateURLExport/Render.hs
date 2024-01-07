@@ -1,8 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
 module Render (render) where
 
 import           Prelude hiding (head, div)
@@ -10,7 +5,6 @@ import           Prelude hiding (head, div)
 import qualified Data.QRCode as QR
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BSL
-import           Data.Maybe (fromJust)
 import           Data.String (fromString)
 import qualified Data.Text as Text
 import qualified Diagrams.Backend.SVG as D
@@ -21,9 +15,9 @@ import           System.FilePath ((</>), (<.>))
 import           Text.Blaze.Html5 hiding (map)
 import           Text.Blaze.Html5.Attributes as Html
 import           Text.Blaze.Html.Renderer.Utf8 (renderHtml)
-import           Network.HTTP.Req (Url, Scheme(Https), (/:), https, renderUrl)
+import           Network.HTTP.Req (renderUrl)
 
-import           Types (Participant(..), TabbycatInstance(..))
+import           Types (Participant(..))
 import           Static (stylesheet)
 
 qrFilename :: Participant -> FilePath

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Types where
 
 import           Data.Text (Text)
@@ -20,7 +20,7 @@ data Participant = Participant
   deriving (Show)
 
 instance Eq Participant where
-  p == q = name p == name q
+  p == q = p.name == q.name
 
 instance Ord Participant where
-  compare p q = compare (name p) (name q)
+  compare p q = compare p.name q.name

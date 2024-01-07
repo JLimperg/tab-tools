@@ -4,7 +4,6 @@ module CmdArgs
 where
 
 import Options.Applicative
-import Data.Text (Text)
 import Types (Token(..), TabbycatInstance(..))
 
 data Command

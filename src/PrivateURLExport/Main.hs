@@ -1,11 +1,7 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
 import           Data.List (sortOn)
-import           Network.HTTP.Req (Url, Scheme(Https), (/:), https, renderUrl)
+import           Network.HTTP.Req (Url, Scheme(Https), (/:), https)
 
 import           Api
 import           CmdArgs
@@ -23,7 +19,7 @@ participantReqToParticipant tabbycat p@ParticipantReq { name, url_key } =
 
 renderParticipants :: [Participant] -> IO ()
 renderParticipants participants =
-  render "output" $ sortOn (\x -> Types.name x) participants
+  render "output" $ sortOn (\x -> x.name) participants
 
 getTabbycatParticipants :: TabbycatInstance -> Token -> IO [Participant]
 getTabbycatParticipants inst token = do

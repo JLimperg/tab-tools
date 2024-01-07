@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings, DataKinds #-}
-
 module CmdArgs (CmdArgs(..), parseCmdArgs) where
 
 import           Options.Applicative
@@ -8,12 +6,12 @@ import           Data.Text (Text)
 import Types (Token(..))
 
 data CmdArgs = CmdArgs
-  { cmdArgsToken :: Token
-  , cmdArgsBaseUrl :: Text
-  , cmdArgsBaseDir :: FilePath
-  , cmdArgsEmailTableFile :: FilePath
-  , cmdArgsHiddenQuestions :: [Text]
-  , cmdArgsRandomizeOrder :: Bool
+  { token :: Token
+  , baseURL :: Text
+  , baseDir :: FilePath
+  , emailTableFile :: FilePath
+  , hiddenQuestions :: [Text]
+  , randomizeOrder :: Bool
   }
 
 cmdArgs :: Parser CmdArgs

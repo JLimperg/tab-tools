@@ -1,6 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE ImportQualifiedPost #-}
-{-# LANGUAGE OverloadedStrings #-}
 module OpenTabInput
 ( readOpenTab )
 where
@@ -10,7 +7,6 @@ import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
 import Network.HTTP.Req (Url, Scheme(Https), https, (/:))
 import System.Exit (exitFailure)
-import System.IO (readFile)
 import Types (Participant(..))
 
 mkPrivateUrl :: Text -> Text -> Url 'Https

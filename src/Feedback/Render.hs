@@ -1,7 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
 module Render (RenderOptions(..), render) where
 
 import           Prelude hiding (head, div)
@@ -65,7 +61,7 @@ withSiteTemplate adjudicator rest = docTypeHtml $ do
 
 randomizeFeedbacks :: StdGen -> NonEmpty RoundFeedbacks -> [Feedback]
 randomizeFeedbacks gen rounds =
-  let fbs = concatMap (NE.toList . feedbacks) $ NE.toList rounds in
+  let fbs = concatMap (\round -> NE.toList round.feedbacks) $ NE.toList rounds in
   shuffle' fbs (length fbs) gen
 
 renderRound :: RoundFeedbacks -> Html

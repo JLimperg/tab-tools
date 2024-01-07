@@ -1,7 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE NamedFieldPuns #-}
-
 module Main (main) where
 
 import qualified Data.ByteString.Lazy as BS
@@ -78,7 +74,7 @@ mungeFeedback
     AdjudicatorReq { id = adjId, name = adjName, url_key, email = adjEmail } <-
       getAdjudicator adjudicator token
     content <-
-      sortOn questionSequenceNumber . catMaybes <$>
+      sortOn (\answer -> answer.questionSequenceNumber) . catMaybes <$>
         traverse (mungeAnswer token hiddenQuestions) answers
     let feedback = Feedback { score, content }
     let roundUrlParts = drop 2 $ reverse (Text.splitOn "/" debate)
@@ -102,7 +98,7 @@ mungeFeedbacks :: [RawFeedback] -> [AdjudicatorFeedbacks]
 mungeFeedbacks feedbacks
   = toList
   $ IntMap.map mungeAdjudicatorFeedbacks
-  $ index adjudicatorId feedbacks
+  $ index (\fb -> fb.adjudicatorId) feedbacks
   where
     mungeAdjudicatorFeedbacks
       :: NonEmpty RawFeedback
@@ -110,7 +106,7 @@ mungeFeedbacks feedbacks
     mungeAdjudicatorFeedbacks feedbacks
       = let RawFeedback { adjudicatorName, urlKey } = NonEmpty.head feedbacks
             feedbackByRound
-              = NonEmpty.groupAllWith1 roundId feedbacks in
+              = NonEmpty.groupAllWith1 (\fb -> fb.roundId) feedbacks in
         AdjudicatorFeedbacks
           { adjudicator = adjudicatorName
           , urlKey = urlKey
@@ -122,7 +118,7 @@ mungeFeedbacks feedbacks
       = let RawFeedback { roundName } = NonEmpty.head feedbacks in
         RoundFeedbacks
           { round = roundName
-          , feedbacks = fmap feedback feedbacks
+          , feedbacks = fmap (\fb -> fb.feedback) feedbacks
           }
 
 mungeAdjudicators :: [RawFeedback] -> [Adjudicator]
@@ -145,25 +141,21 @@ validateAdjudicators = mapM_ $ \ Adjudicator { email, name } ->
 main :: IO ()
 main = do
   cmdArgs <- parseCmdArgs
-  let token = cmdArgsToken cmdArgs
-  let hiddenQuestions = cmdArgsHiddenQuestions cmdArgs
-  let baseDir = cmdArgsBaseDir cmdArgs
-  let baseURLT = cmdArgsBaseUrl cmdArgs
-  baseURI <- mkURI $ cmdArgsBaseUrl cmdArgs
+  baseURI <- mkURI cmdArgs.baseURL
   baseURL <- case useHttpsURI baseURI of
     Just (url, _) -> pure url
-    Nothing -> fail $ "Invalid URL: " ++ Text.unpack baseURLT
-  feedbackReqs <- getFeedback baseURL token
-  rawFeedbacks <-
-    catMaybes <$> traverse (mungeFeedback token hiddenQuestions) feedbackReqs
+    Nothing -> fail $ "Invalid URL: " ++ Text.unpack cmdArgs.baseURL
+  feedbackReqs <- getFeedback baseURL cmdArgs.token
+  rawFeedbacks <- catMaybes <$>
+    traverse (mungeFeedback cmdArgs.token cmdArgs.hiddenQuestions) feedbackReqs
   let feedbacks = mungeFeedbacks rawFeedbacks
   let renderOptions = RenderOptions
-        { baseDir = baseDir
-        , randomizeOrder = cmdArgsRandomizeOrder cmdArgs
+        { baseDir = cmdArgs.baseDir
+        , randomizeOrder = cmdArgs.randomizeOrder
         }
   render renderOptions feedbacks
   let adjudicators = mungeAdjudicators rawFeedbacks
   validateAdjudicators adjudicators
   let emailTable = renderEmailTable adjudicators
-  let emailTableFile = cmdArgsEmailTableFile cmdArgs
+  let emailTableFile = cmdArgs.emailTableFile
   BS.writeFile emailTableFile emailTable

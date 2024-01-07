@@ -1,25 +1,54 @@
+cabal-version:       2.2
 name:                tabbycatt
 version:             0.1.0.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/JLimperg/tabbycatt#readme
-license:             BSD3
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Jannis Limperg
 maintainer:          jannis@limperg.de
 copyright:           (C) 2023 Jannis Limperg
 category:            Application
 build-type:          Simple
-cabal-version:       >=1.10
 extra-source-files:  README.md
                    , static/Feedback/style.css
                    , static/PrivateURLExport/style.css
                    , export-opentab.sh
 
+common defaults
+  default-language:    Haskell2010
+  ghc-options:         -Weverything
+                       -Werror
+                       -Wno-partial-type-signatures
+                       -Wno-name-shadowing
+                       -Wno-missing-import-lists
+                       -Wno-implicit-prelude
+                       -Wno-unsafe
+                       -Wno-safe
+                       -Wno-missing-safe-haskell-mode
+                       -Wno-missing-deriving-strategies
+                       -Wno-monomorphism-restriction
+                       -Wno-all-missed-specializations
+                       -Wno-prepositive-qualified-module
+                       -Wno-missing-kind-signatures
+  default-extensions:  OverloadedStrings
+                     , NamedFieldPuns
+                     , NoFieldSelectors
+                     , OverloadedRecordDot
+                     , DuplicateRecordFields
+                     , ScopedTypeVariables
+                     , FlexibleInstances
+                     , FlexibleContexts
+                     , DataKinds
+                     , ImportQualifiedPost
+                     , DeriveGeneric
+                     , LambdaCase
+
 executable tabbycat-feedback
+  import:              defaults
   hs-source-dirs:      src/Feedback
   main-is:             Main.hs
-  default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , blaze-html
@@ -42,9 +71,9 @@ executable tabbycat-feedback
                      , Types
 
 executable tabbycat-csv-importer
+  import:              defaults
   hs-source-dirs:      src/CSVImport
   main-is:             Main.hs
-  default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , bytestring
@@ -58,25 +87,15 @@ executable tabbycat-csv-importer
                      , Csv
                      , Munging
                      , Validation
-  ghc-options:         -Weverything -Werror -Wno-partial-type-signatures -Wno-name-shadowing -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unsafe -Wno-unsafe -Wno-missing-deriving-strategies -Wno-monomorphism-restriction -Wno-all-missed-specializations -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-missing-kind-signatures
-  default-extensions:  OverloadedStrings
-                     , NamedFieldPuns
-                     , NoFieldSelectors
-                     , OverloadedRecordDot
-                     , OverloadedRecordUpdate
-                     , DuplicateRecordFields
-                     , ScopedTypeVariables
-                     , FlexibleInstances
 
 executable tabbycat-private-url-export
+  import:              defaults
   hs-source-dirs:      src/PrivateURLExport
   main-is:             Main.hs
-  default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , blaze-html
                      , bytestring
-                     , containers
                      , diagrams-lib
                      , diagrams-svg
                      , diagrams-qrcode
@@ -84,7 +103,6 @@ executable tabbycat-private-url-export
                      , filepath
                      , file-embed
                      , haskell-qrencode
-                     , modern-uri
                      , optparse-applicative
                      , req
                      , text

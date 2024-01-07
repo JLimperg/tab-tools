@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
-
 module RenderEmailTable
 ( Adjudicator(..)
 , renderEmailTable )
