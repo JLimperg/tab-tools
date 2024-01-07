@@ -1,0 +1,10 @@
+.question {
+    font-weight: bold;
+}
+
+.feedback {
+    border: 2px solid black;
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-bottom: 1em;
+}

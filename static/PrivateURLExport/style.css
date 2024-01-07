@@ -1,0 +1,12 @@
+.qrcode {
+  width: 3cm;
+  height: 3cm;
+}
+
+.name {
+  padding-bottom: 1em;
+}
+
+td {
+  border-bottom: 1pt black solid;
+}
