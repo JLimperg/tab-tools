@@ -63,6 +63,7 @@ executable tabbycat-feedback
                      , random
                      , random-shuffle
                      , req
+                     , scientific
                      , text
   other-modules:       Api
                      , CmdArgs

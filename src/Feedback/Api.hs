@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Api where
 
-import           Data.Aeson (FromJSON(..), withText)
+import           Data.Aeson (FromJSON)
 import           Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
@@ -9,20 +9,20 @@ import           GHC.Generics (Generic)
 import           Network.HTTP.Req
 import           Text.URI (URI(..), mkURI, mkScheme)
 
-import           Types (Token(..))
+import           Types (Token(..), Answer)
 
-data Answer = Answer
+data QuestionAnswer = QuestionAnswer
   { question :: Text
-  , answer :: Text
+  , answer :: Answer
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
-instance FromJSON Answer
+instance FromJSON QuestionAnswer
 
 data FeedbackReq = FeedbackReq
   { adjudicator :: Text
   , debate :: Text
-  , answers :: [Answer]
+  , answers :: [QuestionAnswer]
   , confirmed :: Bool
   , score :: Float
   }
@@ -47,25 +47,8 @@ data AdjudicatorReq = AdjudicatorReq
 
 instance FromJSON AdjudicatorReq
 
-data AnswerType
-  = AnswerTypeBool
-  | AnswerTypeInt
-  | AnswerTypeText
-  deriving (Read, Show, Eq, Ord, Generic)
-
-instance FromJSON AnswerType where
-  parseJSON = withText "AnswerType" $ \case
-    "bs" -> pure AnswerTypeBool
-    "tl" -> pure AnswerTypeText
-    "ss" -> pure AnswerTypeText
-    "t" -> pure AnswerTypeText
-    "i" -> pure AnswerTypeInt
-    "is" -> pure AnswerTypeInt
-    x -> fail $ "Unknown answer type: " ++ Text.unpack x
-
 data QuestionReq = QuestionReq
   { text :: Text
-  , answer_type :: AnswerType
   , seq :: Int
   }
   deriving (Read, Show, Eq, Ord, Generic)

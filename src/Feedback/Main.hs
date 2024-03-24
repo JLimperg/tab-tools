@@ -32,32 +32,17 @@ data RawFeedback = RawFeedback
   , feedback :: Feedback
   }
 
-parseAnswer :: AnswerType -> Text -> Maybe Types.Answer
-parseAnswer AnswerTypeBool b
-  | b == "true" || b == "True" = pure $ AnswerBool True
-  | b == "false" || b == "False" = pure $ AnswerBool False
-parseAnswer AnswerTypeInt i = AnswerInt <$> readMaybe (Text.unpack i)
-parseAnswer AnswerTypeText t = pure $ AnswerText t
-parseAnswer _ _ = Nothing
-
-mungeAnswer :: Token -> [Text] -> Api.Answer -> IO (Maybe QuestionAnswer)
-mungeAnswer token hiddenQuestions Answer { question, answer } = do
-  QuestionReq { text = questionText, answer_type, seq } <-
+mungeAnswer :: Token -> [Text] -> Api.QuestionAnswer
+  -> IO (Maybe Types.QuestionAnswer)
+mungeAnswer token hiddenQuestions Api.QuestionAnswer { question, answer } = do
+  QuestionReq { text = questionText, seq } <-
     getQuestion question token
   if questionText `elem` hiddenQuestions
     then pure Nothing
-    else
-      case parseAnswer answer_type answer of
-        Nothing -> fail $ concat
-          [ "Unexpected answer. Answer type: "
-          , show answer_type
-          , ". Answer: "
-          , Text.unpack answer
-          ]
-        Just answer' -> pure $ Just $ QuestionAnswer
+    else pure $ Just $ Types.QuestionAnswer
           { question = questionText
           , questionSequenceNumber = seq
-          , answer = answer'
+          , answer = answer
           }
 
 mungeFeedback
