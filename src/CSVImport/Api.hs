@@ -32,7 +32,7 @@ authHeader :: Token -> Option scheme
 authHeader (Token tk) = header "Authorization" $ "Token " <> T.encodeUtf8 tk
 
 mkUrl :: [Text] -> Url 'Https
-mkUrl = foldr (flip (/:)) (https "tabbycat.limperg.de" /: "api" /: "v1")
+mkUrl = foldl (/:) (https "tabbycat.limperg.de" /: "api" /: "v1")
 
 getOpts :: FromJSON a => Url 'Https -> Option 'Https -> Token -> IO a
 getOpts url opts token = runReq defaultHttpConfig $
