@@ -1,4 +1,4 @@
-module Validation
+module CSVImport.Validation
 ( validateSpeakers
 , validateAdjudicators )
 where
@@ -7,7 +7,7 @@ import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as T
 
-import           Csv
+import           CSVImport.Csv as Csv
 
 _MAX_TEAM_REFERENCE_LENGTH :: Int
 _MAX_TEAM_REFERENCE_LENGTH = 151

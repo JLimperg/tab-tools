@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Api where
+module Feedback.Api where
 
 import           Data.Aeson (FromJSON)
 import           Data.Text (Text)
@@ -9,7 +9,7 @@ import           GHC.Generics (Generic)
 import           Network.HTTP.Req
 import           Text.URI (URI(..), mkURI, mkScheme)
 
-import           Types (Token(..), Answer)
+import           Feedback.Types (Token(..), Answer)
 
 data QuestionAnswer = QuestionAnswer
   { question :: Text

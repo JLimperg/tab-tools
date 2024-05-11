@@ -1,4 +1,4 @@
-module OpenTabInput
+module PrivateURLExport.OpenTabInput
 ( readOpenTab )
 where
 
@@ -7,7 +7,8 @@ import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
 import Network.HTTP.Req (Url, Scheme(Https), https, (/:))
 import System.Exit (exitFailure)
-import Types (Participant(..))
+
+import PrivateURLExport.Types (Participant(..))
 
 mkPrivateUrl :: Text -> Text -> Url 'Https
 mkPrivateUrl remoteId key =

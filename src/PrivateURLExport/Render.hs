@@ -1,4 +1,4 @@
-module Render (render) where
+module PrivateURLExport.Render (render) where
 
 import           Prelude hiding (head, div)
 
@@ -17,8 +17,8 @@ import           Text.Blaze.Html5.Attributes as Html
 import           Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 import           Network.HTTP.Req (renderUrl)
 
-import           Types (Participant(..))
-import           Static (stylesheet)
+import           PrivateURLExport.Types (Participant(..))
+import           PrivateURLExport.Static (stylesheet)
 
 qrFilename :: Participant -> FilePath
 qrFilename Participant { urlKey } =

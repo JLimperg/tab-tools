@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Api.Types
+module CSVImport.Api.Types
 ( InstitutionURL(..)
 , TeamURL(..)
 , GetInstitutions(..)
@@ -12,7 +12,6 @@ module Api.Types
 , AddAdjudicator(..)
 ) where
 
-import qualified Csv
 import           Data.Aeson
 import           Data.Aeson.Key as Key
 import           Data.Map (Map)
@@ -20,6 +19,8 @@ import qualified Data.Map as Map
 import           Data.Maybe (isNothing, catMaybes)
 import           Data.Text (Text)
 import qualified Data.Vector as Vector
+
+import qualified CSVImport.Csv as Csv
 
 (.=?) :: ToJSON a => Text -> Maybe a -> Maybe (Key, Value)
 key .=? val = (Key.fromText key .=) <$> val

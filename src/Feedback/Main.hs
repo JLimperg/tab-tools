@@ -16,11 +16,11 @@ import qualified Data.Text.IO as Text
 import           Text.Read (readMaybe)
 import           Text.URI (mkURI)
 
-import           Api
-import           CmdArgs (CmdArgs(..), parseCmdArgs)
-import           Render (RenderOptions (..), render)
-import           RenderEmailTable (Adjudicator(..), renderEmailTable)
-import           Types
+import           Feedback.Api as Api
+import           Feedback.CmdArgs (CmdArgs(..), parseCmdArgs)
+import           Feedback.Render (RenderOptions (..), render)
+import           Feedback.RenderEmailTable (Adjudicator(..), renderEmailTable)
+import           Feedback.Types as Types
 
 data RawFeedback = RawFeedback
   { adjudicatorId :: Int

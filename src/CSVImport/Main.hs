@@ -7,11 +7,11 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Text as Text
 import           System.Exit (exitFailure)
 
-import           Api
-import           Api.Types (GetInstitutions(..), AddInstitution (..))
-import           Csv
-import           Munging
-import           Validation
+import           CSVImport.Api
+import           CSVImport.Api.Types (GetInstitutions(..), AddInstitution (..))
+import           CSVImport.Csv
+import           CSVImport.Munging
+import           CSVImport.Validation
 
 _SPEAKER_CSV, _ADJ_CSV :: FilePath
 _SPEAKER_CSV = "speakers.csv"

@@ -1,9 +1,9 @@
-module CmdArgs (CmdArgs(..), parseCmdArgs) where
+module Feedback.CmdArgs (CmdArgs(..), parseCmdArgs) where
 
-import           Options.Applicative
-import           Data.Text (Text)
+import Options.Applicative
+import Data.Text (Text)
 
-import Types (Token(..))
+import Feedback.Types (Token(..))
 
 data CmdArgs = CmdArgs
   { token :: Token

@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Munging
+module CSVImport.Munging
 ( mungeTeams
 , mungeAdjudicators
 , mungeInstitutions
@@ -14,8 +14,8 @@ import           Data.Maybe (maybeToList)
 import qualified Data.Set as Set
 import qualified Data.Text as T
 
-import qualified Csv
-import qualified Api.Types as Api
+import qualified CSVImport.Csv as Csv
+import qualified CSVImport.Api.Types as Api
 
 maybeToEither :: a -> Maybe b -> Either a b
 maybeToEither a Nothing = Left a

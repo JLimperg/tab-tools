@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Types where
+module Feedback.Types where
 
 import           Data.Aeson (Value(..), FromJSON(..))
 import           Data.List.NonEmpty (NonEmpty)

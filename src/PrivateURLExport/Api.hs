@@ -1,4 +1,4 @@
-module Api
+module PrivateURLExport.Api
 ( ParticipantReq(..)
 , getSpeakers
 , getAdjudicators )
@@ -10,7 +10,7 @@ import qualified Data.Text.Encoding as Text
 import           GHC.Generics (Generic)
 import           Network.HTTP.Req
 
-import           Types (Token(..), TabbycatInstance(..))
+import           PrivateURLExport.Types (Token(..), TabbycatInstance(..))
 
 data ParticipantReq = ParticipantReq
   { name :: Text

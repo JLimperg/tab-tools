@@ -1,4 +1,4 @@
-module Csv
+module CSVImport.Csv
 ( Name(..)
 , EmailAddress(..)
 , PhoneNumber(..)

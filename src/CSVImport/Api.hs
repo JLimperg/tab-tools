@@ -1,4 +1,4 @@
-module Api
+module CSVImport.Api
 ( Token(..)
 , getInstitutions
 , postInstitutions
@@ -17,8 +17,8 @@ import qualified Data.Text.Encoding as T
 import qualified Data.Text.IO as T
 import           Network.HTTP.Req
 
-import           Api.Types
-import qualified Csv
+import           CSVImport.Api.Types
+import qualified CSVImport.Csv as Csv
 
 -- TODO evil hardcoding
 _BASE_URL :: String

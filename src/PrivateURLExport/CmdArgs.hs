@@ -1,10 +1,10 @@
-module CmdArgs
+module PrivateURLExport.CmdArgs
 ( Command(..)
 , parseCmdArgs )
 where
 
 import Options.Applicative
-import Types (Token(..), TabbycatInstance(..))
+import PrivateURLExport.Types (Token(..), TabbycatInstance(..))
 
 data Command
   = Tabbycat TabbycatInstance Token

@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Types where
+module PrivateURLExport.Types where
 
 import           Data.Text (Text)
 import           Network.HTTP.Req (Url, Scheme(Https))

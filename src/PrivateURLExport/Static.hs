@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Static (stylesheet) where
+module PrivateURLExport.Static (stylesheet) where
 
 import Data.ByteString (ByteString)
 import Data.FileEmbed
