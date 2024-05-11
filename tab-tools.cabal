@@ -1,9 +1,9 @@
 cabal-version:       2.2
-name:                tabbycatt
+name:                tab-tools
 version:             0.1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/JLimperg/tabbycatt#readme
+homepage:            https://github.com/JLimperg/tab-tools#readme
 license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Jannis Limperg
