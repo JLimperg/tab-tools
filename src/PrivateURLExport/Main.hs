@@ -38,7 +38,6 @@ main = do
   cmd <- parseCmdArgs
   participants <-
     case cmd of
-      Tabbycat inst token ->
-        runApiM (ApiMContext token inst) getTabbycatParticipants
+      Tabbycat inst token -> runApiM token inst getTabbycatParticipants
       OpenTab fp -> readOpenTab fp
   renderParticipants participants

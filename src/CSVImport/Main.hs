@@ -39,8 +39,7 @@ main = do
     exitFailure
 
   let insts = mungeInstitutions speakers adjs
-  let ctx = ApiMContext args.tabbycatToken args.tabbycatInstance
-  runApiM ctx $ do
+  runApiM args.tabbycatToken args.tabbycatInstance $ do
     GetInstitutions { institutions = oldInstitutions } <- getInstitutions
     insts <- flip filterM insts $ \AddInstitution { code = code } -> do
       if code `Map.member` oldInstitutions then do

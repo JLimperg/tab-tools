@@ -119,16 +119,15 @@ validateAdjudicators = mapM_ $ \ Adjudicator { email, name } ->
 
 main :: IO ()
 main = do
-  cmdArgs <- parseCmdArgs
-  let ctx = ApiMContext cmdArgs.tabbycatToken cmdArgs.tabbycatInstance
-  rawFeedbacks <- runApiM ctx $ do
+  args <- parseCmdArgs
+  rawFeedbacks <- runApiM args.tabbycatToken args.tabbycatInstance $ do
     feedbackReqs <- getFeedback
-    catMaybes <$> traverse (mungeFeedback cmdArgs.hiddenQuestions) feedbackReqs
+    catMaybes <$> traverse (mungeFeedback args.hiddenQuestions) feedbackReqs
   let feedbacks = mungeFeedbacks rawFeedbacks
-  let renderOptions = RenderOptions cmdArgs.baseDir cmdArgs.randomizeOrder
+  let renderOptions = RenderOptions args.baseDir args.randomizeOrder
   render renderOptions feedbacks
   let adjudicators = mungeAdjudicators rawFeedbacks
   validateAdjudicators adjudicators
   let emailTable = renderEmailTable adjudicators
-  let emailTableFile = cmdArgs.emailTableFile
+  let emailTableFile = args.emailTableFile
   BS.writeFile emailTableFile emailTable

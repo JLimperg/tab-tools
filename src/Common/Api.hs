@@ -1,8 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Api
-( ApiMContext(..)
-, ApiM
+( ApiM
 , runApiM
 , getToken
 , getTabbycatInstance
@@ -38,6 +37,7 @@ import Control.Monad.Trans.Reader (ReaderT, runReaderT, ask)
 import Data.Aeson (FromJSON(..), ToJSON(..), Value(..), Key, (.=), (.:), object, withArray, withObject)
 import Data.Aeson.Key qualified as Key
 import Data.Foldable (traverse_)
+import Data.IORef (IORef, readIORef, writeIORef, newIORef)
 import Data.List (foldl')
 import Data.Map (Map)
 import Data.Map qualified as Map
@@ -46,11 +46,13 @@ import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
 import Data.Text.Encoding qualified as Text
+import Data.Typeable (Typeable)
 import Data.Vector qualified as Vector
 import GHC.Generics (Generic)
 import Network.HTTP.Req
 import Text.URI (URI(..), mkURI, mkScheme)
 
+import Api.Cache as Cache
 import Api.Types
 
 infixr 8 .=?
@@ -63,18 +65,28 @@ object' = object . catMaybes
 data ApiMContext = ApiMContext
   { token :: Token
   , tabbycatInstance :: TabbycatInstance
+  , cacheRef :: IORef (Cache 'Https)
   }
 
 type ApiM = ReaderT ApiMContext IO
 
-runApiM :: ApiMContext -> ApiM a -> IO a
-runApiM = flip runReaderT
+runApiM :: Token -> TabbycatInstance -> ApiM a -> IO a
+runApiM token inst f = do
+  cacheRef <- newIORef Cache.empty
+  let ctx = ApiMContext token inst cacheRef
+  runReaderT f ctx
 
 getToken :: ApiM Token
 getToken = (\c -> c.token) <$> ask
 
 getTabbycatInstance :: ApiM TabbycatInstance
 getTabbycatInstance = (\c -> c.tabbycatInstance) <$> ask
+
+getCache :: ApiM (Cache 'Https)
+getCache = ask >>= \ctx -> lift $ readIORef ctx.cacheRef
+
+setCache :: Cache 'Https -> ApiM ()
+setCache cache = ask >>= \ctx -> lift $ writeIORef ctx.cacheRef cache
 
 baseURL :: TabbycatInstance -> Url 'Https
 baseURL TabbycatInstance { host } =
@@ -97,17 +109,21 @@ mkTournamentURL = mkURLCore tournamentBaseURL
 authHeader :: Token -> Option scheme
 authHeader (Token tk) = header "Authorization" $ "Token " <> Text.encodeUtf8 tk
 
-getOpts :: FromJSON a => Url 'Https -> Option 'Https -> ApiM a
+getOpts :: (FromJSON a, Typeable a) => Url 'Https -> Option 'Https -> ApiM a
 getOpts url opts = do
   token <- getToken
-  runReq defaultHttpConfig $
-    responseBody <$> req GET url NoReqBody jsonResponse
-      (authHeader token <> opts)
+  cache <- getCache
+  (cache, result) <- lift $ withCache cache url opts $ do
+    runReq defaultHttpConfig $
+      responseBody <$> req GET url NoReqBody jsonResponse
+        (authHeader token <> opts)
+  setCache cache
+  pure result
 
-get :: FromJSON a => Url 'Https -> ApiM a
+get :: (FromJSON a, Typeable a) => Url 'Https -> ApiM a
 get url = getOpts url mempty
 
-getLink :: FromJSON a => Link -> ApiM a
+getLink :: (FromJSON a, Typeable a) => Link -> ApiM a
 getLink link = do
   httpsScheme <- mkScheme "https"
   uri <- mkURI link.url

@@ -50,6 +50,7 @@ library tab-tools-private
   import:              defaults
   hs-source-dirs:      src/Common
   exposed-modules:     Api
+                     , Api.Cache
                      , Api.Types
                      , CommonCmdArgs
   build-depends:       base
