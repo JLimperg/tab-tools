@@ -1,22 +1,22 @@
 module Feedback.Render (RenderOptions(..), render) where
 
-import           Prelude hiding (head, div)
+import Prelude hiding (head, div)
 
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BSL
-import           Data.List.NonEmpty (NonEmpty)
-import qualified Data.List.NonEmpty as NE
-import           Data.Text (Text)
-import qualified Data.Text as Text
-import           System.Directory (createDirectoryIfMissing)
-import           System.Random (StdGen, initStdGen)
-import           System.Random.Shuffle (shuffle')
-import           Text.Blaze.Html5 hiding (map)
-import           Text.Blaze.Html5.Attributes as Html
-import           Text.Blaze.Html.Renderer.Utf8 (renderHtml)
+import Data.ByteString qualified as BS
+import Data.ByteString.Lazy qualified as BSL
+import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty qualified as NE
+import Data.Text (Text)
+import Data.Text qualified as Text
+import System.Directory (createDirectoryIfMissing)
+import System.Random (StdGen, initStdGen)
+import System.Random.Shuffle (shuffle')
+import Text.Blaze.Html5 hiding (map)
+import Text.Blaze.Html5.Attributes
+import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 
-import           Feedback.Types
-import           Feedback.Static (stylesheet)
+import Feedback.Types
+import Feedback.Static (stylesheet)
 
 data RenderOptions = RenderOptions
   { baseDir :: FilePath

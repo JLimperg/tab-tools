@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Feedback.Types where
 
-import           Data.Aeson (Value(..), FromJSON(..))
-import           Data.List.NonEmpty (NonEmpty)
-import           Data.Scientific (toBoundedInteger)
-import           Data.Text (Text)
+import Data.Aeson (Value(..), FromJSON(..))
+import Data.List.NonEmpty (NonEmpty)
+import Data.Scientific (toBoundedInteger)
+import Data.Text (Text)
 
 newtype Token = Token { fromToken :: Text }
 

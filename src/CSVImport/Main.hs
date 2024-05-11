@@ -1,17 +1,17 @@
 module Main (main) where
 
-import           Control.Monad (unless, filterM)
-import           Data.Coerce (coerce)
-import           Data.Foldable (toList)
-import qualified Data.Map.Strict as Map
-import qualified Data.Text as Text
-import           System.Exit (exitFailure)
+import Control.Monad (unless, filterM)
+import Data.Coerce (coerce)
+import Data.Foldable (toList)
+import Data.Map.Strict qualified as Map
+import Data.Text qualified as Text
+import System.Exit (exitFailure)
 
-import           CSVImport.Api
-import           CSVImport.Api.Types (GetInstitutions(..), AddInstitution (..))
-import           CSVImport.Csv
-import           CSVImport.Munging
-import           CSVImport.Validation
+import CSVImport.Api
+import CSVImport.Api.Types (GetInstitutions(..), AddInstitution (..))
+import CSVImport.Csv
+import CSVImport.Munging
+import CSVImport.Validation
 
 _SPEAKER_CSV, _ADJ_CSV :: FilePath
 _SPEAKER_CSV = "speakers.csv"

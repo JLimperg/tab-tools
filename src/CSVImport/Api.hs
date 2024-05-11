@@ -6,19 +6,19 @@ module CSVImport.Api
 , postAdjudicators
 ) where
 
-import           Data.Aeson (ToJSON,  FromJSON)
-import           Data.Foldable (traverse_)
-import           Data.Functor (void)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import           Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
-import qualified Data.Text.IO as T
-import           Network.HTTP.Req
+import Data.Aeson (ToJSON,  FromJSON)
+import Data.Foldable (traverse_)
+import Data.Functor (void)
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import Data.Text (Text)
+import Data.Text qualified as T
+import Data.Text.Encoding qualified as T
+import Data.Text.IO qualified as T
+import Network.HTTP.Req
 
-import           CSVImport.Api.Types
-import qualified CSVImport.Csv as Csv
+import CSVImport.Api.Types
+import CSVImport.Csv qualified as Csv
 
 -- TODO evil hardcoding
 _BASE_URL :: String

@@ -3,11 +3,11 @@ module CSVImport.Validation
 , validateAdjudicators )
 where
 
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import qualified Data.Text as T
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import Data.Text qualified as T
 
-import           CSVImport.Csv as Csv
+import CSVImport.Csv qualified as Csv
 
 _MAX_TEAM_REFERENCE_LENGTH :: Int
 _MAX_TEAM_REFERENCE_LENGTH = 151
@@ -15,7 +15,7 @@ _MAX_TEAM_REFERENCE_LENGTH = 151
 _MAX_SHORT_TEAM_REFERENCE_LENGTH :: Int
 _MAX_SHORT_TEAM_REFERENCE_LENGTH = 35
 
-validateSpeakers :: Int {- > 0 -} -> Map TeamReference [Csv.Speaker] -> [String]
+validateSpeakers :: Int {- > 0 -} -> Map Csv.TeamReference [Csv.Speaker] -> [String]
 validateSpeakers speakersPerTeam speakers =
   concatMap (uncurry validateTeam) $ Map.toList speakers
   where

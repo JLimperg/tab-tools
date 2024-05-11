@@ -4,11 +4,11 @@ module PrivateURLExport.Api
 , getAdjudicators )
 where
 
-import           Data.Aeson (FromJSON)
-import           Data.Text (Text)
-import qualified Data.Text.Encoding as Text
-import           GHC.Generics (Generic)
-import           Network.HTTP.Req
+import Data.Aeson (FromJSON)
+import Data.Text (Text)
+import Data.Text.Encoding qualified as Text
+import GHC.Generics (Generic)
+import Network.HTTP.Req
 
 import           PrivateURLExport.Types (Token(..), TabbycatInstance(..))
 

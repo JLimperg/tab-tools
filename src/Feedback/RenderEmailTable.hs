@@ -3,11 +3,11 @@ module Feedback.RenderEmailTable
 , renderEmailTable )
 where
 
-import           Data.ByteString.Lazy (ByteString)
-import           Data.Csv
+import Data.ByteString.Lazy (ByteString)
+import Data.Csv
   ( ToNamedRecord, DefaultOrdered(..), encodeDefaultOrderedByName )
-import           Data.Text (Text)
-import           GHC.Generics (Generic)
+import Data.Text (Text)
+import GHC.Generics (Generic)
 
 data Adjudicator = Adjudicator
   { name :: Text

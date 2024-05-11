@@ -1,13 +1,13 @@
 module Main (main) where
 
-import           Data.List (sortOn)
-import           Network.HTTP.Req (Url, Scheme(Https), (/:), https)
+import Data.List (sortOn)
+import Network.HTTP.Req (Url, Scheme(Https), (/:), https)
 
-import           PrivateURLExport.Api
-import           PrivateURLExport.CmdArgs
-import           PrivateURLExport.OpenTabInput
-import           PrivateURLExport.Render
-import           PrivateURLExport.Types
+import PrivateURLExport.Api
+import PrivateURLExport.CmdArgs
+import PrivateURLExport.OpenTabInput
+import PrivateURLExport.Render
+import PrivateURLExport.Types
 
 mkPrivateUrl :: TabbycatInstance -> ParticipantReq -> Url 'Https
 mkPrivateUrl TabbycatInstance { host, tournament } ParticipantReq { url_key } =

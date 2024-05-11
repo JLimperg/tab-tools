@@ -1,24 +1,24 @@
 module PrivateURLExport.Render (render) where
 
-import           Prelude hiding (head, div)
+import Prelude hiding (head, div)
 
-import qualified Data.QRCode as QR
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BSL
-import           Data.String (fromString)
-import qualified Data.Text as Text
-import qualified Diagrams.Backend.SVG as D
-import qualified Diagrams.Prelude as D
-import qualified Diagrams.QRCode as QR
-import           System.Directory (createDirectoryIfMissing)
-import           System.FilePath ((</>), (<.>))
-import           Text.Blaze.Html5 hiding (map)
-import           Text.Blaze.Html5.Attributes as Html
-import           Text.Blaze.Html.Renderer.Utf8 (renderHtml)
-import           Network.HTTP.Req (renderUrl)
+import Data.QRCode qualified as QR
+import Data.ByteString qualified as BS
+import Data.ByteString.Lazy qualified as BSL
+import Data.String (fromString)
+import Data.Text qualified as Text
+import Diagrams.Backend.SVG qualified as D
+import Diagrams.Prelude qualified as D
+import Diagrams.QRCode qualified as QR
+import System.Directory (createDirectoryIfMissing)
+import System.FilePath ((</>), (<.>))
+import Text.Blaze.Html5 hiding (map)
+import Text.Blaze.Html5.Attributes
+import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
+import Network.HTTP.Req (renderUrl)
 
-import           PrivateURLExport.Types (Participant(..))
-import           PrivateURLExport.Static (stylesheet)
+import PrivateURLExport.Types (Participant(..))
+import PrivateURLExport.Static (stylesheet)
 
 qrFilename :: Participant -> FilePath
 qrFilename Participant { urlKey } =

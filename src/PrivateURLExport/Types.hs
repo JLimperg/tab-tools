@@ -1,8 +1,8 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module PrivateURLExport.Types where
 
-import           Data.Text (Text)
-import           Network.HTTP.Req (Url, Scheme(Https))
+import Data.Text (Text)
+import Network.HTTP.Req (Url, Scheme(Https))
 
 newtype Token = Token { fromToken :: Text }
 

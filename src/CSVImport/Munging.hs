@@ -6,16 +6,16 @@ module CSVImport.Munging
 , mungeInstitutions
 ) where
 
-import           Data.Coerce (coerce)
-import           Data.Foldable (toList)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import           Data.Maybe (maybeToList)
-import qualified Data.Set as Set
-import qualified Data.Text as T
+import Data.Coerce (coerce)
+import Data.Foldable (toList)
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import Data.Maybe (maybeToList)
+import Data.Set qualified as Set
+import Data.Text qualified as T
 
-import qualified CSVImport.Csv as Csv
-import qualified CSVImport.Api.Types as Api
+import CSVImport.Csv qualified as Csv
+import CSVImport.Api.Types qualified as Api
 
 maybeToEither :: a -> Maybe b -> Either a b
 maybeToEither a Nothing = Left a

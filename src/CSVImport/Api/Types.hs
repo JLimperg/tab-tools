@@ -12,13 +12,13 @@ module CSVImport.Api.Types
 , AddAdjudicator(..)
 ) where
 
-import           Data.Aeson
-import           Data.Aeson.Key as Key
-import           Data.Map (Map)
-import qualified Data.Map as Map
-import           Data.Maybe (isNothing, catMaybes)
-import           Data.Text (Text)
-import qualified Data.Vector as Vector
+import Data.Aeson
+import Data.Aeson.Key qualified as Key
+import Data.Map (Map)
+import Data.Map qualified as Map
+import Data.Maybe (isNothing, catMaybes)
+import Data.Text (Text)
+import Data.Vector qualified as Vector
 
 import qualified CSVImport.Csv as Csv
 

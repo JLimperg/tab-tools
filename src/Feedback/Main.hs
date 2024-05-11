@@ -1,26 +1,26 @@
 module Main (main) where
 
-import qualified Data.ByteString.Lazy as BS
-import           Data.Containers.ListUtils (nubOrdOn)
-import           Data.Foldable (toList)
-import           Data.IntMap.Strict (IntMap)
-import qualified Data.IntMap.Strict as IntMap
-import           Data.List (sortOn)
-import           Data.List.NonEmpty (NonEmpty((:|)))
-import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Maybe (fromJust, listToMaybe, catMaybes)
-import           Network.HTTP.Req (useHttpsURI)
-import           Data.Text (Text)
-import qualified Data.Text as Text
-import qualified Data.Text.IO as Text
-import           Text.Read (readMaybe)
-import           Text.URI (mkURI)
+import Data.ByteString.Lazy qualified as BS
+import Data.Containers.ListUtils (nubOrdOn)
+import Data.Foldable (toList)
+import Data.IntMap.Strict (IntMap)
+import Data.IntMap.Strict qualified as IntMap
+import Data.List (sortOn)
+import Data.List.NonEmpty (NonEmpty((:|)))
+import Data.List.NonEmpty qualified as NonEmpty
+import Data.Maybe (fromJust, listToMaybe, catMaybes)
+import Network.HTTP.Req (useHttpsURI)
+import Data.Text (Text)
+import Data.Text qualified as Text
+import Data.Text.IO qualified as Text
+import Text.Read (readMaybe)
+import Text.URI (mkURI)
 
-import           Feedback.Api as Api
-import           Feedback.CmdArgs (CmdArgs(..), parseCmdArgs)
-import           Feedback.Render (RenderOptions (..), render)
-import           Feedback.RenderEmailTable (Adjudicator(..), renderEmailTable)
-import           Feedback.Types as Types
+import Feedback.Api as Api
+import Feedback.CmdArgs (CmdArgs(..), parseCmdArgs)
+import Feedback.Render (RenderOptions (..), render)
+import Feedback.RenderEmailTable (Adjudicator(..), renderEmailTable)
+import Feedback.Types as Types
 
 data RawFeedback = RawFeedback
   { adjudicatorId :: Int

@@ -1,15 +1,15 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Feedback.Api where
 
-import           Data.Aeson (FromJSON)
-import           Data.Text (Text)
-import qualified Data.Text as Text
-import qualified Data.Text.Encoding as Text
-import           GHC.Generics (Generic)
-import           Network.HTTP.Req
-import           Text.URI (URI(..), mkURI, mkScheme)
+import Data.Aeson (FromJSON)
+import Data.Text (Text)
+import Data.Text qualified as Text
+import Data.Text.Encoding qualified as Text
+import GHC.Generics (Generic)
+import Network.HTTP.Req
+import Text.URI (URI(..), mkURI, mkScheme)
 
-import           Feedback.Types (Token(..), Answer)
+import Feedback.Types (Token(..), Answer)
 
 data QuestionAnswer = QuestionAnswer
   { question :: Text

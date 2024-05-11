@@ -11,16 +11,16 @@ module CSVImport.Csv
 , parseAdjudicators
 ) where
 
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as LBS
-import           Data.Coerce (coerce)
-import           Data.Csv hiding (Name)
-import           Data.Foldable (foldl')
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import           Data.Text (Text)
-import qualified Data.Text as T
-import           Data.Vector (Vector)
+import Data.ByteString qualified as BS
+import Data.ByteString.Lazy qualified as LBS
+import Data.Coerce (coerce)
+import Data.Csv hiding (Name)
+import Data.Foldable (foldl')
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import Data.Text (Text)
+import Data.Text qualified as T
+import Data.Vector (Vector)
 
 parseBool :: Text -> Parser Bool
 parseBool t = case T.strip t of
