@@ -9,14 +9,13 @@ import Data.List (sortOn)
 import Data.List.NonEmpty (NonEmpty((:|)))
 import Data.List.NonEmpty qualified as NonEmpty
 import Data.Maybe (fromJust, listToMaybe, catMaybes)
-import Network.HTTP.Req (useHttpsURI)
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
 import Text.Read (readMaybe)
-import Text.URI (mkURI)
 
-import Feedback.Api as Api
+import Api
+import Api.Types (Link(..))
 import Feedback.CmdArgs (CmdArgs(..), parseCmdArgs)
 import Feedback.Render (RenderOptions (..), render)
 import Feedback.RenderEmailTable (Adjudicator(..), renderEmailTable)
@@ -32,11 +31,10 @@ data RawFeedback = RawFeedback
   , feedback :: Feedback
   }
 
-mungeAnswer :: Token -> [Text] -> Api.QuestionAnswer
-  -> IO (Maybe Types.QuestionAnswer)
-mungeAnswer token hiddenQuestions Api.QuestionAnswer { question, answer } = do
+mungeAnswer :: [Text] -> Api.QuestionAnswer -> ApiM (Maybe Types.QuestionAnswer)
+mungeAnswer hiddenQuestions Api.QuestionAnswer { question, answer } = do
   QuestionReq { text = questionText, seq } <-
-    getQuestion question token
+    getQuestion question
   if questionText `elem` hiddenQuestions
     then pure Nothing
     else pure $ Just $ Types.QuestionAnswer
@@ -46,26 +44,22 @@ mungeAnswer token hiddenQuestions Api.QuestionAnswer { question, answer } = do
           }
 
 mungeFeedback
-  :: Token
-  -> [Text]
+  :: [Text]
   -> FeedbackReq
-  -> IO (Maybe RawFeedback)
-mungeFeedback _ _ FeedbackReq { confirmed = False } = pure Nothing
-mungeFeedback
-  token
-  hiddenQuestions
-  FeedbackReq { adjudicator, debate, answers, score }
+  -> ApiM (Maybe RawFeedback)
+mungeFeedback _ FeedbackReq { confirmed = False } = pure Nothing
+mungeFeedback hiddenQuestions FeedbackReq { adjudicator, debate, answers, score }
   = do
     AdjudicatorReq { id = adjId, name = adjName, url_key, email = adjEmail } <-
-      getAdjudicator adjudicator token
+      getAdjudicator adjudicator
     content <-
       sortOn (\answer -> answer.questionSequenceNumber) . catMaybes <$>
-        traverse (mungeAnswer token hiddenQuestions) answers
+        traverse (mungeAnswer hiddenQuestions) answers
     let feedback = Feedback { score, content }
-    let roundUrlParts = drop 2 $ reverse (Text.splitOn "/" debate)
+    let roundUrlParts = drop 2 $ reverse (Text.splitOn "/" debate.url)
     let roundId = fromJust $ readMaybe . Text.unpack =<< listToMaybe roundUrlParts -- TODO error handling
-    let roundUrl = Text.intercalate "/" $ reverse roundUrlParts
-    RoundReq { name = roundName} <- getRound roundUrl token
+    let roundUrl = Link $ Text.intercalate "/" $ reverse roundUrlParts
+    RoundReq { name = roundName} <- getRound roundUrl
     pure $ Just $ RawFeedback
       { adjudicatorId = adjId
       , adjudicatorName = adjName
@@ -126,18 +120,12 @@ validateAdjudicators = mapM_ $ \ Adjudicator { email, name } ->
 main :: IO ()
 main = do
   cmdArgs <- parseCmdArgs
-  baseURI <- mkURI cmdArgs.baseURL
-  baseURL <- case useHttpsURI baseURI of
-    Just (url, _) -> pure url
-    Nothing -> fail $ "Invalid URL: " ++ Text.unpack cmdArgs.baseURL
-  feedbackReqs <- getFeedback baseURL cmdArgs.token
-  rawFeedbacks <- catMaybes <$>
-    traverse (mungeFeedback cmdArgs.token cmdArgs.hiddenQuestions) feedbackReqs
+  let ctx = ApiMContext cmdArgs.tabbycatToken cmdArgs.tabbycatInstance
+  rawFeedbacks <- runApiM ctx $ do
+    feedbackReqs <- getFeedback
+    catMaybes <$> traverse (mungeFeedback cmdArgs.hiddenQuestions) feedbackReqs
   let feedbacks = mungeFeedbacks rawFeedbacks
-  let renderOptions = RenderOptions
-        { baseDir = cmdArgs.baseDir
-        , randomizeOrder = cmdArgs.randomizeOrder
-        }
+  let renderOptions = RenderOptions cmdArgs.baseDir cmdArgs.randomizeOrder
   render renderOptions feedbacks
   let adjudicators = mungeAdjudicators rawFeedbacks
   validateAdjudicators adjudicators

@@ -15,6 +15,7 @@ import Text.Blaze.Html5 hiding (map)
 import Text.Blaze.Html5.Attributes
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 
+import Api.Types (FeedbackAnswer(..))
 import Feedback.Types
 import Feedback.Static (stylesheet)
 
@@ -81,9 +82,9 @@ renderQuestionAnswer QuestionAnswer { question, answer } = do
   p ! class_ "question" $ text question
   p ! class_ "answer" $ renderAnswer answer
 
-renderAnswer :: Answer -> Html
+renderAnswer :: FeedbackAnswer -> Html
 renderAnswer = \case
-  AnswerBool True -> "yes"
-  AnswerBool False -> "no"
-  AnswerText t -> mapM_ (p . text) $ Text.lines t
-  AnswerInt i -> string $ show i
+  FeedbackAnswerBool True -> "yes"
+  FeedbackAnswerBool False -> "no"
+  FeedbackAnswerText t -> mapM_ (p . text) $ Text.lines t
+  FeedbackAnswerInt i -> string $ show i

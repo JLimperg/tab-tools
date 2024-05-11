@@ -15,30 +15,27 @@ import Data.Set qualified as Set
 import Data.Text qualified as T
 
 import CSVImport.Csv qualified as Csv
-import CSVImport.Api.Types qualified as Api
+import Api
+import Api.Types as Api
 
 maybeToEither :: a -> Maybe b -> Either a b
 maybeToEither a Nothing = Left a
 maybeToEither _ (Just b) = Right b
 
 lookupInstitutionURL
-  :: Map Csv.InstitutionCode Api.InstitutionURL
-  -> Csv.InstitutionCode
-  -> Either String Api.InstitutionURL
+  :: Map InstitutionCode Link
+  -> InstitutionCode
+  -> Either String Link
 lookupInstitutionURL m i
-  = let err =
-          "institution without associated URL: " ++
-          T.unpack i.fromInstitutionCode
+  = let err = "institution without associated URL: " ++ T.unpack i.code
     in maybeToEither err $ Map.lookup i m
 
 lookupTeamURL
-  :: Map Csv.TeamReference Api.TeamURL
-  -> Csv.TeamReference
-  -> Either String Api.TeamURL
+  :: Map TeamReference Link
+  -> TeamReference
+  -> Either String Link
 lookupTeamURL m t
-  = let err =
-          "team without associated URL: " ++
-          T.unpack t.fromTeamReference
+  = let err = "team without associated URL: " ++ T.unpack t.name
     in maybeToEither err $ Map.lookup t m
 
 mungeSpeaker :: Csv.Speaker -> Api.AddSpeaker
@@ -50,12 +47,12 @@ mungeSpeaker Csv.Speaker {..} = Api.AddSpeaker
   }
 
 mungeTeam
-  :: Map Csv.InstitutionCode Api.InstitutionURL
-  -> Csv.TeamReference
+  :: Map InstitutionCode Link
+  -> TeamReference
   -> [Csv.Speaker]
   -> Either String Api.AddTeam
 mungeTeam institutionURLs reference speakers = do
-  let s = head speakers
+  let s = head speakers -- TODO use NonEmpty
   let institution = s.institution
   let referenceT = coerce reference
   let shortReference = maybe referenceT coerce s.shortTeam
@@ -65,22 +62,22 @@ mungeTeam institutionURLs reference speakers = do
       concatMap (\s -> s.institutionConflicts) speakers
   pure $ Api.AddTeam
     { reference = referenceT
-    , shortReference = shortReference
+    , shortReference = coerce shortReference
     , institution = instURL
     , speakers = map mungeSpeaker speakers
     , institutionConflicts = instConflicts
     }
 
 mungeTeams
-  :: Map Csv.InstitutionCode Api.InstitutionURL
-  -> Map Csv.TeamReference [Csv.Speaker]
+  :: Map InstitutionCode Link
+  -> Map TeamReference [Csv.Speaker]
   -> Either String [Api.AddTeam]
 mungeTeams institutionURLs speakers
   = traverse (uncurry $ mungeTeam institutionURLs) (Map.toList speakers)
 
 mungeAdjudicator
-  :: Map Csv.InstitutionCode Api.InstitutionURL
-  -> Map Csv.TeamReference Api.TeamURL
+  :: Map InstitutionCode Link
+  -> Map TeamReference Link
   -> Csv.Adjudicator
   -> Either String Api.AddAdjudicator
 mungeAdjudicator institutionURLs teamURLs Csv.Adjudicator {..} = do
@@ -101,26 +98,26 @@ mungeAdjudicator institutionURLs teamURLs Csv.Adjudicator {..} = do
     }
 
 mungeAdjudicators
-  :: Map Csv.InstitutionCode Api.InstitutionURL
-  -> Map Csv.TeamReference Api.TeamURL
+  :: Map InstitutionCode Link
+  -> Map TeamReference Link
   -> [Csv.Adjudicator]
   -> Either String [Api.AddAdjudicator]
 mungeAdjudicators institutionURLs teamURLs
   = traverse (mungeAdjudicator institutionURLs teamURLs)
 
-mungeInstitution :: Csv.InstitutionCode -> Api.AddInstitution
-mungeInstitution (Csv.InstitutionCode c) = Api.AddInstitution c
+mungeInstitution :: InstitutionCode -> Api.AddInstitution
+mungeInstitution (InstitutionCode c) = Api.AddInstitution $ Api.InstitutionCode c
 
-speakerInstitutions :: Csv.Speaker -> [Csv.InstitutionCode]
+speakerInstitutions :: Csv.Speaker -> [InstitutionCode]
 speakerInstitutions speaker
   = maybeToList speaker.institution ++ speaker.institutionConflicts
 
-adjudicatorInstitutions :: Csv.Adjudicator -> [Csv.InstitutionCode]
+adjudicatorInstitutions :: Csv.Adjudicator -> [InstitutionCode]
 adjudicatorInstitutions adj
   = maybeToList adj.institution ++ adj.institutionConflicts
 
 mungeInstitutions
-  :: Map Csv.TeamReference [Csv.Speaker]
+  :: Map TeamReference [Csv.Speaker]
   -> [Csv.Adjudicator]
   -> [Api.AddInstitution]
 mungeInstitutions teams adjs

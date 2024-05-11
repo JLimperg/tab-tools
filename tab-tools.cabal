@@ -46,27 +46,40 @@ common defaults
                      , LambdaCase
                      , StrictData
 
+library tab-tools-private
+  import:              defaults
+  hs-source-dirs:      src/Common
+  exposed-modules:     Api
+                     , Api.Types
+                     , CommonCmdArgs
+  build-depends:       base
+                     , aeson
+                     , containers
+                     , modern-uri
+                     , optparse-applicative
+                     , req
+                     , scientific
+                     , text
+                     , transformers
+                     , vector
+
 executable tabbycat-feedback
   import:              defaults
   hs-source-dirs:      src
   main-is:             Feedback/Main.hs
   build-depends:       base >= 4.7 && < 5
-                     , aeson
+                     , tab-tools-private
                      , blaze-html
                      , bytestring
                      , cassava
                      , containers
                      , directory
                      , file-embed
-                     , modern-uri
                      , optparse-applicative
                      , random
                      , random-shuffle
-                     , req
-                     , scientific
                      , text
-  other-modules:       Feedback.Api
-                     , Feedback.CmdArgs
+  other-modules:       Feedback.CmdArgs
                      , Feedback.Render
                      , Feedback.RenderEmailTable
                      , Feedback.Static
@@ -77,15 +90,15 @@ executable tabbycat-csv-importer
   hs-source-dirs:      src
   main-is:             CSVImport/Main.hs
   build-depends:       base >= 4.7 && < 5
-                     , aeson
+                     , tab-tools-private
                      , bytestring
                      , cassava
                      , containers
-                     , req
+                     , optparse-applicative
                      , text
+                     , transformers
                      , vector
-  other-modules:       CSVImport.Api
-                     , CSVImport.Api.Types
+  other-modules:       CSVImport.CmdArgs
                      , CSVImport.Csv
                      , CSVImport.Munging
                      , CSVImport.Validation
@@ -95,7 +108,7 @@ executable tabbycat-private-url-export
   hs-source-dirs:      src
   main-is:             PrivateURLExport/Main.hs
   build-depends:       base >= 4.7 && < 5
-                     , aeson
+                     , tab-tools-private
                      , blaze-html
                      , bytestring
                      , diagrams-lib
@@ -108,8 +121,7 @@ executable tabbycat-private-url-export
                      , optparse-applicative
                      , req
                      , text
-  other-modules:       PrivateURLExport.Api
-                     , PrivateURLExport.CmdArgs
+  other-modules:       PrivateURLExport.CmdArgs
                      , PrivateURLExport.OpenTabInput
                      , PrivateURLExport.Render
                      , PrivateURLExport.Static

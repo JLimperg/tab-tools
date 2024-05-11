@@ -1,10 +1,12 @@
 module PrivateURLExport.CmdArgs
 ( Command(..)
-, parseCmdArgs )
-where
+, parseCmdArgs
+) where
 
 import Options.Applicative
-import PrivateURLExport.Types (Token(..), TabbycatInstance(..))
+
+import Api.Types (Token, TabbycatInstance)
+import CommonCmdArgs (tabbycatInstance, tabbycatToken)
 
 data Command
   = Tabbycat TabbycatInstance Token
@@ -15,22 +17,8 @@ tabbycatCommand =
   command "tabbycat"
     (info tabbycatOptions (progDesc "Export Tabbycat private links"))
 
-tabbycatInstance :: Parser TabbycatInstance
-tabbycatInstance = TabbycatInstance
-  <$> strOption
-        (long "host" <>
-         help "Tabbycat host, e.g. tabbycat.limperg.de")
-  <*> strOption
-        (long "tournament" <>
-         help "Tabbycat tournament URL slug, e.g. wudc2023")
-
 tabbycatOptions :: Parser Command
-tabbycatOptions = Tabbycat
-  <$> tabbycatInstance
-  <*> (Token <$> strOption
-        (long "token" <>
-         metavar "TOKEN" <>
-         help "Tabbycat API token."))
+tabbycatOptions = Tabbycat <$> tabbycatInstance <*> tabbycatToken
 
 openTabCommand :: Mod CommandFields Command
 openTabCommand =

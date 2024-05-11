@@ -3,11 +3,12 @@ module Feedback.CmdArgs (CmdArgs(..), parseCmdArgs) where
 import Options.Applicative
 import Data.Text (Text)
 
-import Feedback.Types (Token(..))
+import Api.Types (Token, TabbycatInstance)
+import CommonCmdArgs (tabbycatInstance, tabbycatToken)
 
 data CmdArgs = CmdArgs
-  { token :: Token
-  , baseURL :: Text
+  { tabbycatToken :: Token
+  , tabbycatInstance :: TabbycatInstance
   , baseDir :: FilePath
   , emailTableFile :: FilePath
   , hiddenQuestions :: [Text]
@@ -16,14 +17,8 @@ data CmdArgs = CmdArgs
 
 cmdArgs :: Parser CmdArgs
 cmdArgs = CmdArgs
-  <$> (Token <$> strOption
-        (long "token" <>
-         metavar "TOKEN" <>
-         help "Tabbycat API token."))
-  <*> strOption
-        (long "url" <>
-         metavar "URL" <>
-         help "Base Tabbycat API URL for the tournament. Usually looks like https://<dom>.herokuapp.com/api/v1/tournaments/<tournament-slug>")
+  <$> tabbycatToken
+  <*> tabbycatInstance
   <*> strOption
         (long "basedir" <>
          metavar "DIR" <>

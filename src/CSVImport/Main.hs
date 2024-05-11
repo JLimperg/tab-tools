@@ -1,30 +1,22 @@
 module Main (main) where
 
 import Control.Monad (unless, filterM)
-import Data.Coerce (coerce)
+import Control.Monad.Trans.Class (lift)
 import Data.Foldable (toList)
 import Data.Map.Strict qualified as Map
 import Data.Text qualified as Text
+import Data.Vector qualified as Vector
 import System.Exit (exitFailure)
 
-import CSVImport.Api
-import CSVImport.Api.Types (GetInstitutions(..), AddInstitution (..))
-import CSVImport.Csv
+import Api
+import Api.Types
+import CSVImport.CmdArgs
+import CSVImport.Csv as Csv
 import CSVImport.Munging
 import CSVImport.Validation
 
-_SPEAKER_CSV, _ADJ_CSV :: FilePath
-_SPEAKER_CSV = "speakers.csv"
-_ADJ_CSV = "adjudicators.csv"
-
 _SPEAKERS_PER_TEAM :: Int
 _SPEAKERS_PER_TEAM = 2
-
-_TOKEN :: Token
-_TOKEN = Token "52298698979d985f1c36df97dd545d338875cffe"
-
-_TOURNAMENT_SLUG :: String
-_TOURNAMENT_SLUG = "zdj2023"
 
 eitherToMonadFail :: MonadFail m => Either String a -> m a
 eitherToMonadFail (Left err) = fail err
@@ -32,8 +24,11 @@ eitherToMonadFail (Right a) = pure a
 
 main :: IO ()
 main = do
-  speakers <- parseSpeakers _SPEAKER_CSV
-  adjs <- toList <$> parseAdjudicators _ADJ_CSV
+  args <- parseCmdArgs
+  speakers <- parseSpeakers args.speakersFile
+  adjsVec <- parseAdjudicators args.adjudicatorsFile
+  let adjs = toList adjsVec
+  let numAdjs = Vector.length adjsVec
 
   let errors =
         validateSpeakers _SPEAKERS_PER_TEAM speakers ++
@@ -44,19 +39,21 @@ main = do
     exitFailure
 
   let insts = mungeInstitutions speakers adjs
-  existingInstMap <- (\resp -> resp.institutions) <$> getInstitutions _TOKEN
-  insts <- flip filterM insts $ \AddInstitution { code = code } -> do
-    if coerce code `Map.member` existingInstMap then do
-      putStrLn $ "Skipping existing institution " ++ Text.unpack code
-      pure False
-    else
-      pure True
-  instMap' <- postInstitutions _TOKEN insts
-  let instMap = Map.union instMap' existingInstMap
-  putStrLn $ "Added " ++ show (length instMap) ++ " institutions."
-  teams' <- eitherToMonadFail $ mungeTeams instMap speakers
-  teamMap <- postTeams _TOKEN _TOURNAMENT_SLUG teams'
-  putStrLn $ "Added " ++ show (length teamMap) ++ " teams."
-  adjs' <- eitherToMonadFail $ mungeAdjudicators instMap teamMap adjs
-  postAdjudicators _TOKEN _TOURNAMENT_SLUG adjs'
-  putStrLn $ "Added " ++ show (length adjs) ++ " adjudicators."
+  let ctx = ApiMContext args.tabbycatToken args.tabbycatInstance
+  runApiM ctx $ do
+    GetInstitutions { institutions = oldInstitutions } <- getInstitutions
+    insts <- flip filterM insts $ \AddInstitution { code = code } -> do
+      if code `Map.member` oldInstitutions then do
+        lift $ putStrLn $ "Skipping existing institution " ++ Text.unpack code.code
+        pure False
+      else
+        pure True
+    newInstitutions <- postInstitutions insts
+    lift $ putStrLn $ "Added " ++ show (length newInstitutions) ++ " institutions."
+    let allInstitutions = Map.union oldInstitutions newInstitutions
+    teams' <- eitherToMonadFail $ mungeTeams allInstitutions speakers
+    teamMap <- postTeams teams'
+    lift $ putStrLn $ "Added " ++ show (length teamMap) ++ " teams."
+    adjs' <- eitherToMonadFail $ mungeAdjudicators allInstitutions teamMap adjs
+    postAdjudicators adjs'
+    lift $ putStrLn $ "Added " ++ show numAdjs ++ " adjudicators."

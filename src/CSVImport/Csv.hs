@@ -1,9 +1,9 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 module CSVImport.Csv
 ( Name(..)
 , EmailAddress(..)
 , PhoneNumber(..)
-, InstitutionCode(..)
-, TeamReference(..)
 , ShortTeamReference(..)
 , Speaker(..)
 , Adjudicator(..)
@@ -22,6 +22,8 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Vector (Vector)
 
+import Api.Types (InstitutionCode(..), TeamReference(..))
+
 parseBool :: Text -> Parser Bool
 parseBool t = case T.strip t of
   "true" -> pure True
@@ -35,17 +37,11 @@ parseList :: Text -> [Text]
 parseList "" = []
 parseList t = map T.strip $ T.split (== ';') t
 
-newtype InstitutionCode = InstitutionCode { fromInstitutionCode :: Text }
-  deriving (Eq, Ord, Read, Show)
-
 instance FromField InstitutionCode where
   parseField = coerce parseText
 
 instance FromField [InstitutionCode] where
   parseField = fmap (coerce . parseList) . parseText
-
-newtype TeamReference = TeamReference { fromTeamReference :: Text }
-  deriving (Eq, Ord, Read, Show)
 
 instance FromField TeamReference where
   parseField = coerce parseText
