@@ -16,10 +16,40 @@ extra-source-files:  README.md
                    , static/PrivateURLExport/style.css
                    , export-opentab.sh
 
-executable tabt
+common defaults
+  default-language:    Haskell2010
+  ghc-options:         -Weverything
+                       -Werror
+                       -Wno-partial-type-signatures
+                       -Wno-name-shadowing
+                       -Wno-missing-import-lists
+                       -Wno-implicit-prelude
+                       -Wno-unsafe
+                       -Wno-safe
+                       -Wno-missing-safe-haskell-mode
+                       -Wno-missing-deriving-strategies
+                       -Wno-monomorphism-restriction
+                       -Wno-all-missed-specializations
+                       -Wno-prepositive-qualified-module
+                       -Wno-missing-kind-signatures
+  default-extensions:  OverloadedStrings
+                     , NamedFieldPuns
+                     , NoFieldSelectors
+                     , OverloadedRecordDot
+                     , DuplicateRecordFields
+                     , ScopedTypeVariables
+                     , FlexibleInstances
+                     , FlexibleContexts
+                     , DataKinds
+                     , ImportQualifiedPost
+                     , DeriveGeneric
+                     , LambdaCase
+                     , StrictData
+
+library internal
+  import:              defaults
   hs-source-dirs:      src
-  main-is:             Main.hs
-  other-modules:       Api
+  exposed-modules:     Api
                      , Api.Cache
                      , Api.Types
                      , CommonCmdArgs
@@ -62,31 +92,11 @@ executable tabt
                      , text
                      , transformers
                      , vector
-  default-language:    Haskell2010
-  ghc-options:         -Weverything
-                       -Werror
-                       -Wno-partial-type-signatures
-                       -Wno-name-shadowing
-                       -Wno-missing-import-lists
-                       -Wno-implicit-prelude
-                       -Wno-unsafe
-                       -Wno-safe
-                       -Wno-missing-safe-haskell-mode
-                       -Wno-missing-deriving-strategies
-                       -Wno-monomorphism-restriction
-                       -Wno-all-missed-specializations
-                       -Wno-prepositive-qualified-module
-                       -Wno-missing-kind-signatures
-  default-extensions:  OverloadedStrings
-                     , NamedFieldPuns
-                     , NoFieldSelectors
-                     , OverloadedRecordDot
-                     , DuplicateRecordFields
-                     , ScopedTypeVariables
-                     , FlexibleInstances
-                     , FlexibleContexts
-                     , DataKinds
-                     , ImportQualifiedPost
-                     , DeriveGeneric
-                     , LambdaCase
-                     , StrictData
+
+executable tabt
+  import:              defaults
+  hs-source-dirs:      src/Main
+  main-is:             Main.hs
+  build-depends:       base >= 4.15 && < 5
+                     , internal
+                     , optparse-applicative
