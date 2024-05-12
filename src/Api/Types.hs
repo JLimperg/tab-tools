@@ -6,6 +6,7 @@ module Api.Types where
 import Data.Aeson (FromJSON(..), ToJSON(..), Value(..))
 import Data.Scientific (toBoundedInteger)
 import Data.Text (Text)
+import Data.Text qualified as Text
 
 newtype Token = Token { fromToken :: Text }
 
@@ -39,3 +40,9 @@ instance FromJSON FeedbackAnswer where
         Just i -> pure $ FeedbackAnswerInt i
     Bool b   -> pure $ FeedbackAnswerBool b
     v -> fail $ "While parsing answer: expected string, number or boolean, but got '" ++ show v ++ "'"
+
+renderFeedbackAnswer :: FeedbackAnswer -> Text
+renderFeedbackAnswer = \case
+  FeedbackAnswerBool b -> Text.pack $ show b
+  FeedbackAnswerText t -> t
+  FeedbackAnswerInt  n -> Text.pack $ show n

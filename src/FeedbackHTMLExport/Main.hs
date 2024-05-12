@@ -8,14 +8,11 @@ import Data.IntMap.Strict qualified as IntMap
 import Data.List (sortOn)
 import Data.List.NonEmpty (NonEmpty((:|)))
 import Data.List.NonEmpty qualified as NonEmpty
-import Data.Maybe (fromJust, listToMaybe, catMaybes)
+import Data.Maybe (catMaybes)
 import Data.Text (Text)
-import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
-import Text.Read (readMaybe)
 
 import Api
-import Api.Types (Link(..))
 import FeedbackHTMLExport.CmdArgs (CmdArgs(..))
 import FeedbackHTMLExport.Render (RenderOptions (..), render)
 import FeedbackHTMLExport.RenderEmailTable (Adjudicator(..), renderEmailTable)
@@ -56,17 +53,15 @@ mungeFeedback hiddenQuestions FeedbackReq { adjudicator, debate, answers, score 
       sortOn (\answer -> answer.questionSequenceNumber) . catMaybes <$>
         traverse (mungeAnswer hiddenQuestions) answers
     let feedback = Feedback { score, content }
-    let roundUrlParts = drop 2 $ reverse (Text.splitOn "/" debate.url)
-    let roundId = fromJust $ readMaybe . Text.unpack =<< listToMaybe roundUrlParts -- TODO error handling
-    let roundUrl = Link $ Text.intercalate "/" $ reverse roundUrlParts
-    RoundReq { name = roundName} <- getRound roundUrl
+    (roundId, roundURL) <- debateURLToRound debate
+    RoundReq { name = roundName } <- getRound roundURL
     pure $ Just $ RawFeedback
       { adjudicatorId = adjId
       , adjudicatorName = adjName
       , adjudicatorEmail = adjEmail
       , urlKey = url_key
-      , roundId = roundId
-      , roundName = roundName
+      , roundId
+      , roundName
       , feedback
       }
 

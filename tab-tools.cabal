@@ -45,6 +45,7 @@ common defaults
                      , DeriveGeneric
                      , LambdaCase
                      , StrictData
+                     , TupleSections
 
 library internal
   import:              defaults
@@ -58,6 +59,8 @@ library internal
                      , CSVImport.Main
                      , CSVImport.Munging
                      , CSVImport.Validation
+                     , FeedbackCSVExport.CmdArgs
+                     , FeedbackCSVExport.Main
                      , FeedbackHTMLExport.CmdArgs
                      , FeedbackHTMLExport.Main
                      , FeedbackHTMLExport.Render
@@ -91,6 +94,7 @@ library internal
                      , scientific
                      , text
                      , transformers
+                     , unordered-containers
                      , vector
 
 executable tabt

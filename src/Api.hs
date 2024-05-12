@@ -5,6 +5,7 @@ module Api
 , runApiM
 , getToken
 , getTabbycatInstance
+, debateURLToRound
 , GetParticipantsResponse(..)
 , getSpeakers
 , getAdjudicators
@@ -17,6 +18,9 @@ module Api
 , getAdjudicator
 , QuestionReq(..)
 , getQuestion
+, FeedbackSourceReq(..)
+, feedbackSourceIdent
+, getFeedbackSource
 , GetInstitutions(..)
 , getInstitutions
 , AddInstitution(..)
@@ -31,6 +35,7 @@ module Api
 , postAdjudicators
 ) where
 
+import Control.Applicative ((<|>))
 import Control.Monad (void, foldM)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Reader (ReaderT, runReaderT, ask)
@@ -43,7 +48,7 @@ import Data.IORef (IORef, readIORef, writeIORef, newIORef)
 import Data.List (foldl')
 import Data.Map (Map)
 import Data.Map qualified as Map
-import Data.Maybe (isNothing, catMaybes)
+import Data.Maybe (isNothing, catMaybes, listToMaybe)
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
@@ -51,6 +56,7 @@ import Data.Text.Encoding qualified as Text
 import Data.Vector qualified as Vector
 import GHC.Generics (Generic)
 import Network.HTTP.Req
+import Text.Read (readMaybe)
 import Text.URI (URI(..), mkURI, mkScheme)
 
 import Api.Cache as Cache
@@ -156,6 +162,14 @@ postOpts_ url opts body = do
 post_ :: ToJSON a => Url 'Https -> a -> ApiM ()
 post_ url = postOpts_ url mempty
 
+debateURLToRound :: Link -> ApiM (Int, Link)
+debateURLToRound debateURL = do
+  let roundURLParts = drop 2 $ reverse (Text.splitOn "/" debateURL.url)
+  let roundURL = Link $ Text.intercalate "/" $ reverse roundURLParts
+  case readMaybe . Text.unpack =<< listToMaybe roundURLParts of
+    Nothing -> fail $ "Unexpected format of round URL: "  ++ show debateURL.url
+    Just roundId -> pure (roundId, roundURL)
+
 data GetParticipantsResponse = GetParticipantsResponse
   { name :: Text
   , url_key :: Text
@@ -184,6 +198,9 @@ data FeedbackReq = FeedbackReq
   , answers :: [QuestionAnswer]
   , confirmed :: Bool
   , score :: Float
+  , source :: Link
+  , timestamp :: Text
+  , id :: Integer
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -218,6 +235,8 @@ getAdjudicator = getLink
 data QuestionReq = QuestionReq
   { text :: Text
   , seq :: Int
+  , name :: Text
+  , reference :: Text
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -225,6 +244,31 @@ instance FromJSON QuestionReq
 
 getQuestion :: Link -> ApiM QuestionReq
 getQuestion = getLink
+
+data FeedbackSourceReq
+  = FeedbackSourceTeam Text
+  | FeedbackSourceAdjudicator Text
+  deriving (Read, Show, Eq, Ord)
+
+feedbackSourceIdent :: FeedbackSourceReq -> Text
+feedbackSourceIdent = \case
+  FeedbackSourceTeam n -> n
+  FeedbackSourceAdjudicator n -> n
+
+instance FromJSON FeedbackSourceReq where
+  parseJSON v = flip (withObject "FeedbackSource") v $
+    \obj -> team obj <|> participant obj
+    where
+      team obj = do
+        ref <- obj .: "short_reference"
+        pure $ FeedbackSourceTeam ref
+
+      participant obj = do
+        name <- obj .: "name"
+        pure $ FeedbackSourceAdjudicator name
+
+getFeedbackSource :: Link -> ApiM FeedbackSourceReq
+getFeedbackSource = getLink
 
 newtype GetInstitutions = GetInstitutions
   { institutions :: Map InstitutionCode Link }
