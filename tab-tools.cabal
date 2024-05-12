@@ -46,23 +46,27 @@ common defaults
                      , LambdaCase
                      , StrictData
 
-library tab-tools-private
+executable tabt
   import:              defaults
   hs-source-dirs:      src
-  exposed-modules:     Api
+  main-is:             Main.hs
+  other-modules:       Api
                      , Api.Cache
                      , Api.Types
                      , CommonCmdArgs
                      , CSVImport.CmdArgs
                      , CSVImport.Csv
+                     , CSVImport.Main
                      , CSVImport.Munging
                      , CSVImport.Validation
                      , Feedback.CmdArgs
+                     , Feedback.Main
                      , Feedback.Render
                      , Feedback.RenderEmailTable
                      , Feedback.Static
                      , Feedback.Types
                      , PrivateURLExport.CmdArgs
+                     , PrivateURLExport.Main
                      , PrivateURLExport.OpenTabInput
                      , PrivateURLExport.Render
                      , PrivateURLExport.Static
@@ -89,32 +93,3 @@ library tab-tools-private
                      , text
                      , transformers
                      , vector
-
-executable tabbycat-feedback
-  import:              defaults
-  hs-source-dirs:      src/Feedback
-  main-is:             Main.hs
-  build-depends:       base >= 4.7 && < 5
-                     , tab-tools-private
-                     , bytestring
-                     , containers
-                     , text
-
-executable tabbycat-csv-importer
-  import:              defaults
-  hs-source-dirs:      src/CSVImport
-  main-is:             Main.hs
-  build-depends:       base >= 4.7 && < 5
-                     , tab-tools-private
-                     , containers
-                     , text
-                     , transformers
-                     , vector
-
-executable tabbycat-private-url-export
-  import:              defaults
-  hs-source-dirs:      src/PrivateURLExport
-  main-is:             Main.hs
-  build-depends:       base >= 4.7 && < 5
-                     , tab-tools-private
-                     , req

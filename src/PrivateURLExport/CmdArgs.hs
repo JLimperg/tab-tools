@@ -1,7 +1,4 @@
-module PrivateURLExport.CmdArgs
-( Command(..)
-, parseCmdArgs
-) where
+module PrivateURLExport.CmdArgs (Command(..), cmdArgs) where
 
 import Options.Applicative
 
@@ -34,9 +31,3 @@ openTabOptions = OpenTab
 
 cmdArgs :: Parser Command
 cmdArgs = hsubparser (tabbycatCommand <> openTabCommand)
-
-cmdInfo :: ParserInfo Command
-cmdInfo = info (helper <*> cmdArgs) mempty
-
-parseCmdArgs :: IO Command
-parseCmdArgs = execParser cmdInfo

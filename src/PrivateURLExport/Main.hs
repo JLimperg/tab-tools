@@ -1,4 +1,4 @@
-module Main (main) where
+module PrivateURLExport.Main (main) where
 
 import Data.List (sortOn)
 import Network.HTTP.Req (Url, Scheme(Https), (/:), https)
@@ -33,9 +33,8 @@ getTabbycatParticipants = do
   inst <- getTabbycatInstance
   pure $ map (participantReqToParticipant inst) $ speakers ++ adjudicators
 
-main :: IO ()
-main = do
-  cmd <- parseCmdArgs
+main :: Command -> IO ()
+main cmd = do
   participants <-
     case cmd of
       Tabbycat inst token -> runApiM token inst getTabbycatParticipants

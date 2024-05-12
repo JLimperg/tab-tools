@@ -1,4 +1,4 @@
-module Main (main) where
+module CSVImport.Main (main) where
 
 import Control.Monad (unless, filterM)
 import Control.Monad.Trans.Class (lift)
@@ -22,9 +22,8 @@ eitherToMonadFail :: MonadFail m => Either String a -> m a
 eitherToMonadFail (Left err) = fail err
 eitherToMonadFail (Right a) = pure a
 
-main :: IO ()
-main = do
-  args <- parseCmdArgs
+main :: CmdArgs -> IO ()
+main args = do
   speakers <- parseSpeakers args.speakersFile
   adjsVec <- parseAdjudicators args.adjudicatorsFile
   let adjs = toList adjsVec

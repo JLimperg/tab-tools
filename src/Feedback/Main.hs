@@ -1,4 +1,4 @@
-module Main (main) where
+module Feedback.Main (main) where
 
 import Data.ByteString.Lazy qualified as BS
 import Data.Containers.ListUtils (nubOrdOn)
@@ -16,7 +16,7 @@ import Text.Read (readMaybe)
 
 import Api
 import Api.Types (Link(..))
-import Feedback.CmdArgs (CmdArgs(..), parseCmdArgs)
+import Feedback.CmdArgs (CmdArgs(..))
 import Feedback.Render (RenderOptions (..), render)
 import Feedback.RenderEmailTable (Adjudicator(..), renderEmailTable)
 import Feedback.Types as Types
@@ -117,9 +117,8 @@ validateAdjudicators = mapM_ $ \ Adjudicator { email, name } ->
       "Warning: no email address for adjudicator " <> name
     Just _ -> pure ()
 
-main :: IO ()
-main = do
-  args <- parseCmdArgs
+main :: CmdArgs -> IO ()
+main args = do
   rawFeedbacks <- runApiM args.tabbycatToken args.tabbycatInstance $ do
     feedbackReqs <- getFeedback
     catMaybes <$> traverse (mungeFeedback args.hiddenQuestions) feedbackReqs

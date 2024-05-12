@@ -1,7 +1,4 @@
-module CSVImport.CmdArgs
-( CmdArgs(..)
-, parseCmdArgs
-) where
+module CSVImport.CmdArgs (CmdArgs(..), cmdArgs) where
 
 import Options.Applicative
 
@@ -27,9 +24,3 @@ cmdArgs = CmdArgs
         (long "adjudicators" <>
          metavar "FILE" <>
          help "CSV file containing adjudicator data.")
-
-cmdInfo :: ParserInfo CmdArgs
-cmdInfo = info (helper <*> cmdArgs) mempty
-
-parseCmdArgs :: IO CmdArgs
-parseCmdArgs = execParser cmdInfo

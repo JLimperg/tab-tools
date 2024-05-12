@@ -1,4 +1,4 @@
-module Feedback.CmdArgs (CmdArgs(..), parseCmdArgs) where
+module Feedback.CmdArgs (CmdArgs(..), cmdArgs) where
 
 import Options.Applicative
 import Data.Text (Text)
@@ -36,9 +36,3 @@ cmdArgs = CmdArgs
   <*> flag True False
         (long "no-randomize" <>
          help "Don't randomize the order of feedback sheets and show which round each sheet is from.")
-
-cmdInfo :: ParserInfo CmdArgs
-cmdInfo = info cmdArgs mempty
-
-parseCmdArgs :: IO CmdArgs
-parseCmdArgs = execParser cmdInfo
