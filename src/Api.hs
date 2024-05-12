@@ -34,7 +34,9 @@ module Api
 import Control.Monad (void, foldM)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Reader (ReaderT, runReaderT, ask)
-import Data.Aeson (FromJSON(..), ToJSON(..), Value(..), Key, (.=), (.:), object, withArray, withObject)
+import Data.Aeson
+  ( FromJSON(..), ToJSON(..), Value(..), Key, (.=), (.:), object, withArray
+  , withObject, eitherDecode )
 import Data.Aeson.Key qualified as Key
 import Data.Foldable (traverse_)
 import Data.IORef (IORef, readIORef, writeIORef, newIORef)
@@ -46,7 +48,6 @@ import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
 import Data.Text.Encoding qualified as Text
-import Data.Typeable (Typeable)
 import Data.Vector qualified as Vector
 import GHC.Generics (Generic)
 import Network.HTTP.Req
@@ -109,21 +110,23 @@ mkTournamentURL = mkURLCore tournamentBaseURL
 authHeader :: Token -> Option scheme
 authHeader (Token tk) = header "Authorization" $ "Token " <> Text.encodeUtf8 tk
 
-getOpts :: (FromJSON a, Typeable a) => Url 'Https -> Option 'Https -> ApiM a
+getOpts :: (FromJSON a) => Url 'Https -> Option 'Https -> ApiM a
 getOpts url opts = do
   token <- getToken
   cache <- getCache
-  (cache, result) <- lift $ withCache cache url opts $ do
-    runReq defaultHttpConfig $
-      responseBody <$> req GET url NoReqBody jsonResponse
+  (cache, json) <- lift $ withCache cache url opts $ do
+    runReq defaultHttpConfig $ do
+      responseBody <$> req GET url NoReqBody lbsResponse
         (authHeader token <> opts)
   setCache cache
-  pure result
+  case eitherDecode json of
+    Left err -> fail $ "Malformed JSON response: " ++ err
+    Right result -> pure result
 
-get :: (FromJSON a, Typeable a) => Url 'Https -> ApiM a
+get :: (FromJSON a) => Url 'Https -> ApiM a
 get url = getOpts url mempty
 
-getLink :: (FromJSON a, Typeable a) => Link -> ApiM a
+getLink :: (FromJSON a) => Link -> ApiM a
 getLink link = do
   httpsScheme <- mkScheme "https"
   uri <- mkURI link.url
