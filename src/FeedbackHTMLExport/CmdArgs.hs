@@ -1,4 +1,4 @@
-module Feedback.CmdArgs (CmdArgs(..), cmdArgs) where
+module FeedbackHTMLExport.CmdArgs (CmdArgs(..), cmdArgs) where
 
 import Options.Applicative
 import Data.Text (Text)

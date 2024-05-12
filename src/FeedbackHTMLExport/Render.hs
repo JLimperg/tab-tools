@@ -1,4 +1,4 @@
-module Feedback.Render (RenderOptions(..), render) where
+module FeedbackHTMLExport.Render (RenderOptions(..), render) where
 
 import Prelude hiding (head, div)
 
@@ -16,8 +16,8 @@ import Text.Blaze.Html5.Attributes
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 
 import Api.Types (FeedbackAnswer(..))
-import Feedback.Types
-import Feedback.Static (stylesheet)
+import FeedbackHTMLExport.Types
+import FeedbackHTMLExport.Static (stylesheet)
 
 data RenderOptions = RenderOptions
   { baseDir :: FilePath

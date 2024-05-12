@@ -28,12 +28,12 @@ executable tabt
                      , CSVImport.Main
                      , CSVImport.Munging
                      , CSVImport.Validation
-                     , Feedback.CmdArgs
-                     , Feedback.Main
-                     , Feedback.Render
-                     , Feedback.RenderEmailTable
-                     , Feedback.Static
-                     , Feedback.Types
+                     , FeedbackHTMLExport.CmdArgs
+                     , FeedbackHTMLExport.Main
+                     , FeedbackHTMLExport.Render
+                     , FeedbackHTMLExport.RenderEmailTable
+                     , FeedbackHTMLExport.Static
+                     , FeedbackHTMLExport.Types
                      , PrivateURLExport.CmdArgs
                      , PrivateURLExport.Main
                      , PrivateURLExport.OpenTabInput

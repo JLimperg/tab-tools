@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Feedback.Static (stylesheet) where
+module FeedbackHTMLExport.Static (stylesheet) where
 
 import Data.ByteString (ByteString)
 import Data.FileEmbed

@@ -1,4 +1,4 @@
-module Feedback.Main (main) where
+module FeedbackHTMLExport.Main (main) where
 
 import Data.ByteString.Lazy qualified as BS
 import Data.Containers.ListUtils (nubOrdOn)
@@ -16,10 +16,10 @@ import Text.Read (readMaybe)
 
 import Api
 import Api.Types (Link(..))
-import Feedback.CmdArgs (CmdArgs(..))
-import Feedback.Render (RenderOptions (..), render)
-import Feedback.RenderEmailTable (Adjudicator(..), renderEmailTable)
-import Feedback.Types as Types
+import FeedbackHTMLExport.CmdArgs (CmdArgs(..))
+import FeedbackHTMLExport.Render (RenderOptions (..), render)
+import FeedbackHTMLExport.RenderEmailTable (Adjudicator(..), renderEmailTable)
+import FeedbackHTMLExport.Types as Types
 
 data RawFeedback = RawFeedback
   { adjudicatorId :: Int

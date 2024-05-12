@@ -1,4 +1,4 @@
-module Feedback.RenderEmailTable
+module FeedbackHTMLExport.RenderEmailTable
 ( Adjudicator(..)
 , renderEmailTable )
 where

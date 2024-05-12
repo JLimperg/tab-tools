@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
-module Feedback.Types where
+module FeedbackHTMLExport.Types where
 
 import Data.List.NonEmpty (NonEmpty)
 import Data.Text (Text)
