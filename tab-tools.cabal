@@ -48,16 +48,42 @@ common defaults
 
 library tab-tools-private
   import:              defaults
-  hs-source-dirs:      src/Common
+  hs-source-dirs:      src
   exposed-modules:     Api
                      , Api.Cache
                      , Api.Types
                      , CommonCmdArgs
+                     , CSVImport.CmdArgs
+                     , CSVImport.Csv
+                     , CSVImport.Munging
+                     , CSVImport.Validation
+                     , Feedback.CmdArgs
+                     , Feedback.Render
+                     , Feedback.RenderEmailTable
+                     , Feedback.Static
+                     , Feedback.Types
+                     , PrivateURLExport.CmdArgs
+                     , PrivateURLExport.OpenTabInput
+                     , PrivateURLExport.Render
+                     , PrivateURLExport.Static
+                     , PrivateURLExport.Types
   build-depends:       base
                      , aeson
+                     , blaze-html
+                     , bytestring
+                     , cassava
                      , containers
+                     , diagrams-lib
+                     , diagrams-svg
+                     , diagrams-qrcode
+                     , directory
+                     , filepath
+                     , file-embed
+                     , haskell-qrencode
                      , modern-uri
                      , optparse-applicative
+                     , random
+                     , random-shuffle
                      , req
                      , scientific
                      , text
@@ -66,64 +92,29 @@ library tab-tools-private
 
 executable tabbycat-feedback
   import:              defaults
-  hs-source-dirs:      src
-  main-is:             Feedback/Main.hs
+  hs-source-dirs:      src/Feedback
+  main-is:             Main.hs
   build-depends:       base >= 4.7 && < 5
                      , tab-tools-private
-                     , blaze-html
                      , bytestring
-                     , cassava
                      , containers
-                     , directory
-                     , file-embed
-                     , optparse-applicative
-                     , random
-                     , random-shuffle
                      , text
-  other-modules:       Feedback.CmdArgs
-                     , Feedback.Render
-                     , Feedback.RenderEmailTable
-                     , Feedback.Static
-                     , Feedback.Types
 
 executable tabbycat-csv-importer
   import:              defaults
-  hs-source-dirs:      src
-  main-is:             CSVImport/Main.hs
+  hs-source-dirs:      src/CSVImport
+  main-is:             Main.hs
   build-depends:       base >= 4.7 && < 5
                      , tab-tools-private
-                     , bytestring
-                     , cassava
                      , containers
-                     , optparse-applicative
                      , text
                      , transformers
                      , vector
-  other-modules:       CSVImport.CmdArgs
-                     , CSVImport.Csv
-                     , CSVImport.Munging
-                     , CSVImport.Validation
 
 executable tabbycat-private-url-export
   import:              defaults
-  hs-source-dirs:      src
-  main-is:             PrivateURLExport/Main.hs
+  hs-source-dirs:      src/PrivateURLExport
+  main-is:             Main.hs
   build-depends:       base >= 4.7 && < 5
                      , tab-tools-private
-                     , blaze-html
-                     , bytestring
-                     , diagrams-lib
-                     , diagrams-svg
-                     , diagrams-qrcode
-                     , directory
-                     , filepath
-                     , file-embed
-                     , haskell-qrencode
-                     , optparse-applicative
                      , req
-                     , text
-  other-modules:       PrivateURLExport.CmdArgs
-                     , PrivateURLExport.OpenTabInput
-                     , PrivateURLExport.Render
-                     , PrivateURLExport.Static
-                     , PrivateURLExport.Types
