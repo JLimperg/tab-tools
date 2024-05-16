@@ -9,6 +9,7 @@ data CmdArgs = CmdArgs
   { token :: Token
   , tabbycatInstance :: TabbycatInstance
   , outputFile :: FilePath
+  , oldFeedbackFile :: Maybe FilePath
   }
 
 cmdArgs :: Parser CmdArgs
@@ -21,3 +22,7 @@ cmdArgs = CmdArgs
         metavar "FILE" <>
         value "output/feedback.csv" <>
         help "Path of the output CSV file."))
+  <*> (optional $ strOption
+        (long "old-feedback" <>
+         metavar "FILE" <>
+         help "Path of a previously generated CSV file. Feedbacks already present in this file will not be exported."))

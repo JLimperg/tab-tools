@@ -11,16 +11,19 @@ import Data.Map.Strict qualified as Map
 import Data.HashMap.Strict qualified as HashMap
 import Data.HashSet (HashSet)
 import Data.HashSet qualified as HashSet
+import Data.IntSet (IntSet)
+import Data.IntSet qualified as IntSet
 import Data.Text (Text)
 import Data.Text.Encoding qualified as Text
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
+import GHC.Generics (Generic)
+import System.Directory (createDirectoryIfMissing)
 import System.FilePath (takeDirectory)
 
 import Api
 import Api.Types (renderFeedbackAnswer, FeedbackAnswer)
 import FeedbackCSVExport.CmdArgs
-import System.Directory (createDirectoryIfMissing)
 
 data Feedbacks = Feedbacks
   { headers :: Vector BS.ByteString
@@ -37,7 +40,7 @@ data QuestionAnswer' = QuestionAnswer'
   }
 
 data Feedback = Feedback
-  { id :: Integer
+  { id :: Int
   , roundSeq :: Int
   , adjudicator :: Text
   , source :: FeedbackSourceReq
@@ -121,18 +124,43 @@ nonQuestionHeaders :: Vector BS.ByteString
 nonQuestionHeaders =
   ["id", "round", "adjudicator", "source", "score", "confirmed"]
 
-mungeFeedbacks :: [FeedbackReq] -> ApiM Feedbacks
-mungeFeedbacks fbs = do
-  fbs' <- completeFeedbacks fbs
-  let questionNames = collectQuestionNames fbs'
+newtype FeedbackId = FeedbackId { id :: Int }
+  deriving (Generic)
+
+instance FromNamedRecord FeedbackId
+
+getAlreadyExportedFeedbacks :: Maybe FilePath -> IO (Maybe IntSet)
+getAlreadyExportedFeedbacks csvFileM = do
+  case csvFileM of
+    Nothing -> pure Nothing
+    Just csvFile -> do
+      input <- BL.readFile csvFile
+      let result :: Either String (Header, Vector FeedbackId)
+            = decodeByName input
+      case result of
+        Left err -> fail err
+        Right (_, ids) ->
+          pure $ Just $ IntSet.fromList $ map (\x -> x.id) $ Vector.toList ids
+
+mungeFeedbacks :: Maybe IntSet -> [FeedbackReq] -> ApiM Feedbacks
+mungeFeedbacks oldFeedbacksM fbs = do
+  let fbs'
+        = case oldFeedbacksM of
+            Nothing -> fbs
+            Just oldFeedbacks ->
+              filter (\fb -> not $ fb.id `IntSet.member` oldFeedbacks) fbs
+  fbs'' <- completeFeedbacks fbs'
+  let questionNames = collectQuestionNames fbs''
       headers = nonQuestionHeaders <> Vector.fromList questionNames
       questionNameSet = HashSet.fromList questionNames
-      feedbacks = map (feedbackToNamedRecord questionNameSet) fbs'
+      feedbacks = map (feedbackToNamedRecord questionNameSet) fbs''
   pure Feedbacks { headers, feedbacks }
 
 main :: CmdArgs -> IO ()
 main args = do
+  oldFeedbacksM <- getAlreadyExportedFeedbacks args.oldFeedbackFile
   fbs <- runApiM args.token args.tabbycatInstance $
-    getFeedback >>= mungeFeedbacks
+    getFeedback >>= mungeFeedbacks oldFeedbacksM
+  let fbsRendered = renderFeedbacks fbs
   createDirectoryIfMissing True $ takeDirectory args.outputFile
-  BL.writeFile args.outputFile $ renderFeedbacks fbs
+  BL.writeFile args.outputFile fbsRendered

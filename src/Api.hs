@@ -200,7 +200,7 @@ data FeedbackReq = FeedbackReq
   , score :: Float
   , source :: Link
   , timestamp :: Text
-  , id :: Integer
+  , id :: Int
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
