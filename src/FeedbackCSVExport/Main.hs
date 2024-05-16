@@ -38,7 +38,7 @@ data QuestionAnswer' = QuestionAnswer'
 
 data Feedback = Feedback
   { id :: Integer
-  , roundName :: Text
+  , roundSeq :: Int
   , adjudicator :: Text
   , source :: FeedbackSourceReq
   , score :: Float
@@ -70,7 +70,7 @@ completeFeedbacks = mapM go
       answers <- completeAnswers fb.answers
       pure $ Feedback
         { id = fb.id
-        , roundName = round.name
+        , roundSeq = round.seq
         , adjudicator = adjudicator.name
         , source
         , score = fb.score
@@ -101,7 +101,7 @@ feedbackToNamedRecord questionNames fb
   where
     baseMap =
       [ ("id", toField fb.id)
-      , ("round", toField fb.roundName)
+      , ("round", toField fb.roundSeq)
       , ("adjudicator", toField fb.adjudicator)
       , ("source", toField $ feedbackSourceIdent fb.source)
       , ("score", toField fb.score)

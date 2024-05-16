@@ -209,8 +209,9 @@ instance FromJSON FeedbackReq
 getFeedback :: ApiM [FeedbackReq]
 getFeedback = mkTournamentURL ["feedback"] >>= get
 
-newtype RoundReq = RoundReq
+data RoundReq = RoundReq
   { name :: Text
+  , seq :: Int
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
