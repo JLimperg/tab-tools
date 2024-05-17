@@ -197,6 +197,7 @@ data FeedbackReq = FeedbackReq
   , debate :: Link
   , answers :: [QuestionAnswer]
   , confirmed :: Bool
+  , ignored :: Bool
   , score :: Float
   , source :: Link
   , timestamp :: Text

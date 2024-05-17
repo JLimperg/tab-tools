@@ -10,6 +10,8 @@ data CmdArgs = CmdArgs
   , tabbycatInstance :: TabbycatInstance
   , outputFile :: FilePath
   , oldFeedbackFile :: Maybe FilePath
+  , omitIgnored :: Bool
+  , omitUnconfirmed :: Bool
   }
 
 cmdArgs :: Parser CmdArgs
@@ -26,3 +28,9 @@ cmdArgs = CmdArgs
         (long "old-feedback" <>
          metavar "FILE" <>
          help "Path of a previously generated CSV file. Feedbacks already present in this file will not be exported."))
+  <*> flag True False
+        (long "omit-ignored" <>
+         help "Don't export ignored feedbacks.")
+  <*> flag True False
+        (long "omit-unconfirmed" <>
+         help "Don't export unconfirmed feedbacks.")

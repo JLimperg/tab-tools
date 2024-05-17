@@ -46,6 +46,7 @@ data Feedback = Feedback
   , source :: FeedbackSourceReq
   , score :: Float
   , confirmed :: Bool
+  , ignored :: Bool
   , answers :: [QuestionAnswer']
   }
 
@@ -78,6 +79,7 @@ completeFeedbacks = mapM go
         , source
         , score = fb.score
         , confirmed = fb.confirmed
+        , ignored = fb.ignored
         , answers
         }
 
@@ -109,6 +111,7 @@ feedbackToNamedRecord questionNames fb
       , ("source", toField $ feedbackSourceIdent fb.source)
       , ("score", toField fb.score)
       , ("confirmed", boolToField fb.confirmed)
+      , ("ignored", boolToField fb.ignored)
       ]
 
     answerMap = HashMap.fromList
@@ -122,7 +125,7 @@ feedbackToNamedRecord questionNames fb
 
 nonQuestionHeaders :: Vector BS.ByteString
 nonQuestionHeaders =
-  ["id", "round", "adjudicator", "source", "score", "confirmed"]
+  ["id", "round", "adjudicator", "source", "score", "confirmed", "ignored"]
 
 newtype FeedbackId = FeedbackId { id :: Int }
   deriving (Generic)
@@ -142,25 +145,39 @@ getAlreadyExportedFeedbacks csvFileM = do
         Right (_, ids) ->
           pure $ Just $ IntSet.fromList $ map (\x -> x.id) $ Vector.toList ids
 
-mungeFeedbacks :: Maybe IntSet -> [FeedbackReq] -> ApiM Feedbacks
-mungeFeedbacks oldFeedbacksM fbs = do
+mungeFeedbacks
+  :: Bool -- Omit ignored feedbacks
+  -> Bool -- Omit unconfirmed feedbacks
+  -> Maybe IntSet -- Omit feedbacks with these IDs
+  -> [FeedbackReq]
+  -> ApiM Feedbacks
+mungeFeedbacks omitIgnored omitUnconfirmed oldFeedbacksM fbs = do
   let fbs'
         = case oldFeedbacksM of
             Nothing -> fbs
             Just oldFeedbacks ->
               filter (\fb -> not $ fb.id `IntSet.member` oldFeedbacks) fbs
-  fbs'' <- completeFeedbacks fbs'
-  let questionNames = collectQuestionNames fbs''
+      fbs''
+        = if not (omitIgnored || omitUnconfirmed) then
+            fbs'
+          else
+            filter
+              (\fb -> not (omitIgnored && fb.ignored) &&
+                      not (omitUnconfirmed && not fb.confirmed))
+              fbs'
+  fbs''' <- completeFeedbacks fbs''
+  let questionNames = collectQuestionNames fbs'''
       headers = nonQuestionHeaders <> Vector.fromList questionNames
       questionNameSet = HashSet.fromList questionNames
-      feedbacks = map (feedbackToNamedRecord questionNameSet) fbs''
+      feedbacks = map (feedbackToNamedRecord questionNameSet) fbs'''
   pure Feedbacks { headers, feedbacks }
 
 main :: CmdArgs -> IO ()
 main args = do
   oldFeedbacksM <- getAlreadyExportedFeedbacks args.oldFeedbackFile
   fbs <- runApiM args.token args.tabbycatInstance $
-    getFeedback >>= mungeFeedbacks oldFeedbacksM
+    getFeedback >>=
+      mungeFeedbacks args.omitIgnored args.omitUnconfirmed oldFeedbacksM
   let fbsRendered = renderFeedbacks fbs
   createDirectoryIfMissing True $ takeDirectory args.outputFile
   BL.writeFile args.outputFile fbsRendered
